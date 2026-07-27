@@ -1,0 +1,13 @@
+# Cartelle degli agenti IA e IDE
+.agents/
+.idea/
+.vscode/
+
+# Build Maven (Java)
+target/
+*.class
+*.jar
+
+# Sistema
+.DS_Store
+*.log
