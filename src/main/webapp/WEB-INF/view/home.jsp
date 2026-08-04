@@ -9,12 +9,12 @@
 <!-- ======== HERO WITH VIDEO BACKGROUND ======== -->
 <section class="hero-section hero-video-container">
   <!-- Video Background (muted, autoplay, loop) -->
-  <video class="hero-video" autoplay muted loop playsinline>
+  <video class="hero-video" autoplay muted loop playsinline poster="${pageContext.request.contextPath}/images/static/LamboStaticHome.avif">
     <source src="${pageContext.request.contextPath}/videos/hero-cars.mp4" type="video/mp4">
     <!-- Fallback to image if video not available -->
   </video>
   <!-- Fallback background image -->
-  <div class="hero-bg"></div>
+  <div class="hero-bg" style="background-image: url('${pageContext.request.contextPath}/images/static/LamboStaticHome.avif');"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <p class="hero-eyebrow">Veicoli, Ricambi &amp; Accessori</p>
@@ -174,9 +174,10 @@
         </a>
       </div>
       <div class="col-lg-6 text-center mt-4 mt-lg-0">
-        <div class="d-flex align-items-center justify-content-center" style="min-height:320px; border-radius:8px; border:1px solid rgba(212,175,55,0.18); background:#111; box-shadow:0 20px 60px rgba(0,0,0,0.5); color:#D4AF37; letter-spacing:3px; text-transform:uppercase;">
-          AutoHUB Noleggio
-        </div>
+        <img src="${pageContext.request.contextPath}/images/static/FerrariLogoStaticHome.jpg"
+             alt="Noleggio Auto di Lusso"
+             class="img-fluid rounded"
+             style="max-height:320px; object-fit:cover; border:1px solid rgba(212,175,55,0.18); box-shadow:0 20px 60px rgba(0,0,0,0.5);">
       </div>
     </div>
   </div>
