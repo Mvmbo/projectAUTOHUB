@@ -1,0 +1,114 @@
+/* =============================================================
+   AutoHUB – Main Stylesheet (Customer Site)
+   ============================================================= */
+
+/* ---------- CSS Variables ---------- */
+:root {
+  --black:     #0A0A0A;
+  --charcoal:  #1A1A1A;
+  --dark-grey: #2A2A2A;
+  --gold:      #D4AF37;
+  --gold-light:#F0C040;
+  --copper:    #B87333;
+  --white:     #FFFFFF;
+  --text-muted:#888888;
+  --border:    rgba(212, 175, 55, 0.2);
+  --card-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  line-height: 1.2;
+}
+
+a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--gold-light); }
+
+img { max-width: 100%; height: auto; }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--dark-grey); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background: rgba(0, 0, 0, 0.96) !important;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold) !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.navbar-brand span { color: var(--white); opacity: 0.6; font-size: 0.8rem; font-family: 'Montserrat', sans-serif; display: block; letter-spacing: 5px; }
+
+.nav-link {
+  color: rgba(255,255,255,0.75) !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem !important;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-link:hover,
+.nav-link.active { color: var(--gold) !important; }
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.nav-link:hover::after,
+.nav-link.active::after { transform: scaleX(1); }
+
+.navbar-toggler { border-color: var(--border); }
+.navbar-toggler-icon { filter: invert(1); }
+
+.cart-badge {
+  background: var(--gold);
+  color: #000;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  vertical-align: middle;
+}
