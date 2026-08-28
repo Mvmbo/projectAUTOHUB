@@ -568,3 +568,165 @@ img { max-width: 100%; height: auto; }
   text-align: center;
   font-size: 0.9rem;
 }
+
+/* ---------- Catalog Layout ---------- */
+.catalog-sidebar {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.5rem;
+  position: sticky;
+  top: 80px;
+}
+
+.filter-heading {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-group { margin-bottom: 2rem; }
+
+.filter-label {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Forms ---------- */
+.form-control, .form-select {
+  background: var(--dark-grey) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: var(--white) !important;
+  border-radius: 3px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15) !important;
+  outline: none !important;
+  background: var(--dark-grey) !important;
+  color: var(--white) !important;
+}
+
+.form-control::placeholder { color: #555 !important; }
+
+.form-control.is-invalid,
+.form-control.error-field {
+  border-color: rgba(220,53,69,0.6) !important;
+}
+
+.form-label {
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  min-height: 1.2em;
+  letter-spacing: 0.5px;
+}
+
+.alert-error-block {
+  background: rgba(220,53,69,0.1);
+  border: 1px solid rgba(220,53,69,0.3);
+  color: #ff6b6b;
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Auth Pages ---------- */
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000 0%, #0f0f0f 50%, #000 100%);
+  display: flex;
+  align-items: center;
+}
+
+.auth-card {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.auth-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+.account-type-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.account-type-option {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(212,175,55,0.14);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.account-type-option:has(input:checked) {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.08);
+}
+
+.account-type-option input {
+  accent-color: var(--gold);
+  margin-top: 0.25rem;
+}
+
+.account-type-option strong {
+  display: block;
+  color: var(--white);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.account-type-option small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  margin-top: 0.25rem;
+}
+
