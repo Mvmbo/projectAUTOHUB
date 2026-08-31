@@ -1,0 +1,195 @@
+/* =============================================================
+   AutoHUB – Admin Panel Stylesheet
+   ============================================================= */
+
+:root {
+  --gold:    #D4AF37;
+  --gold-light: #F0C040;
+  --black:   #0A0A0A;
+  --sidebar-bg: #0D0D0D;
+  --content-bg: #111111;
+  --card-bg:  #1A1A1A;
+  --border:   rgba(212,175,55,0.15);
+  --text-dim: #666;
+  --text-mid: #999;
+}
+
+* { box-sizing: border-box; }
+
+body.admin-body {
+  margin: 0;
+  padding: 0;
+  background: var(--content-bg);
+  color: #ccc;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.admin-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.admin-brand {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-brand-name {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.admin-brand-sub {
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 0.7rem 1.5rem;
+  color: var(--text-mid);
+  text-decoration: none;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-nav a:hover {
+  color: var(--gold);
+  background: rgba(212,175,55,0.04);
+  border-left-color: var(--gold);
+}
+
+.sidebar-nav a.active {
+  color: var(--gold);
+  background: rgba(212,175,55,0.06);
+  border-left-color: var(--gold);
+}
+
+.sidebar-nav a i { margin-right: 0.6rem; width: 16px; text-align: center; }
+
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0.75rem 1.5rem;
+}
+
+.sidebar-nav a.danger { color: #ff6b6b; }
+.sidebar-nav a.danger:hover { color: #ff4444; border-left-color: #ff4444; }
+
+/* ---------- Main content ---------- */
+.admin-main {
+  margin-left: 250px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Topbar ---------- */
+.admin-topbar {
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-page-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+  margin: 0;
+}
+
+.admin-user-info {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.admin-user-info span { color: var(--gold); }
+
+/* ---------- Content area ---------- */
+.admin-content {
+  padding: 2rem;
+  flex: 1;
+}
+
+/* ---------- Stat Cards ---------- */
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--gold); }
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(212,175,55,0.08);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-size: 2rem;
+  color: var(--gold);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
