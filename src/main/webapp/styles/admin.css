@@ -336,3 +336,115 @@ body.admin-body {
   text-transform: uppercase;
   margin-bottom: 0.4rem;
 }
+
+/* ---------- Status Badges ---------- */
+.status-confirmed { color: var(--gold);   background: rgba(212,175,55,0.1);  border: 1px solid rgba(212,175,55,0.3);  padding: 3px 10px; border-radius: 2px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; }
+.status-pending   { color: #B87333; background: rgba(184,115,51,0.1); border: 1px solid rgba(184,115,51,0.3); padding: 3px 10px; border-radius: 2px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; }
+.status-active    { color: #5cb85c; background: rgba(92,184,92,0.1);  border: 1px solid rgba(92,184,92,0.3);  padding: 3px 10px; border-radius: 2px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; }
+.status-deleted   { color: #ff6b6b; background: rgba(220,53,69,0.1);  border: 1px solid rgba(220,53,69,0.3);  padding: 3px 10px; border-radius: 2px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ---------- Filter Bar ---------- */
+.filter-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Image Preview ---------- */
+.img-preview-wrap {
+  width: 100%;
+  height: 200px;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.img-preview-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* ---------- Alert ---------- */
+.admin-alert {
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 1.25rem;
+  border: 1px solid;
+}
+
+.admin-alert-success { color: #5cb85c; background: rgba(92,184,92,0.08); border-color: rgba(92,184,92,0.25); }
+.admin-alert-error   { color: #ff6b6b; background: rgba(220,53,69,0.08); border-color: rgba(220,53,69,0.25); }
+
+/* ---------- Login Page ---------- */
+body.admin-login-page {
+  background: radial-gradient(ellipse at center, #111 0%, #000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.admin-login-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.admin-login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-login-logo h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  letter-spacing: 4px;
+  font-size: 1.5rem;
+}
+
+.admin-login-logo p {
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ---------- Field error ---------- */
+.field-error {
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+  min-height: 1.1em;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .admin-sidebar { width: 200px; }
+  .admin-main { margin-left: 200px; }
+  .admin-content { padding: 1rem; }
+}
+
+@media (max-width: 576px) {
+  .admin-sidebar { display: none; }
+  .admin-main { margin-left: 0; }
+}
