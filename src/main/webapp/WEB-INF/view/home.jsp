@@ -6,14 +6,8 @@
 <c:set var="pageTitle" value="AutoHUB – Il Tuo Marketplace Automobilistico" scope="request"/>
 <jsp:include page="header.jsp"/>
 
-<!-- ======== HERO WITH VIDEO BACKGROUND ======== -->
-<section class="hero-section hero-video-container">
-  <!-- Video Background (muted, autoplay, loop) -->
-  <video class="hero-video" autoplay muted loop playsinline poster="${pageContext.request.contextPath}/images/static/LamboStaticHome.avif">
-    <source src="${pageContext.request.contextPath}/videos/hero-cars.mp4" type="video/mp4">
-    <!-- Fallback to image if video not available -->
-  </video>
-  <!-- Fallback background image -->
+<!-- ======== HERO WITH STATIC IMAGE BACKGROUND ======== -->
+<section class="hero-section">
   <div class="hero-bg" style="background-image: url('${pageContext.request.contextPath}/images/static/LamboStaticHome.avif');"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
@@ -25,7 +19,6 @@
       <a href="${pageContext.request.contextPath}/rentals" class="btn-outline-gold">Noleggia Auto</a>
     </div>
   </div>
-  <!-- Scroll indicator -->
   <div class="scroll-indicator">
     <i class="bi bi-chevron-double-down"></i>
   </div>
@@ -46,13 +39,11 @@
 
     <div class="video-showcase">
       <div class="video-frame">
-        <iframe class="promo-video"
-                src="https://www.youtube.com/embed/O8G1Sanw7Ls?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&playlist=O8G1Sanw7Ls"
-                title="Presentazione AutoHUB"
-                frameborder="0"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowfullscreen>
-        </iframe>
+        <video class="promo-video"
+               autoplay muted loop playsinline
+               poster="${pageContext.request.contextPath}/images/static/LamboStaticHome.avif">
+          <source src="${pageContext.request.contextPath}/videos/hero-cars.mp4" type="video/mp4">
+        </video>
         <div class="video-luxury-overlay" aria-hidden="true">
           <span class="video-overlay-line"></span>
           <span class="video-overlay-label">AutoHUB Selection</span>
