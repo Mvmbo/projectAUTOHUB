@@ -1,449 +1,238 @@
-# AutoHUB – Website Design Document
+# AutoHUB – Design Document
 ## Tecnologie Software per il Web – A.A. 2025/2026
 ### Prof. Simone Romano – Università degli Studi di Salerno
 
 ---
 
-## 1. Obiettivo del Progetto
 
-**AutoHUB** è una piattaforma di e-commerce dedicata al settore automobilistico. L'obiettivo principale è offrire a privati e appassionati un unico ambiente digitale dove acquistare veicoli, componenti di performance e accessori per auto di lusso e sportive.
+## 1. Obiettivo del progetto
 
-Il sistema centralizza servizi oggi frammentati su piattaforme diverse, eliminando la necessità di visitare più siti per trovare prodotti automobilistici. Il pubblico di riferimento comprende appassionati di auto sportive, collezionisti e professionisti del settore che cercano prodotti di qualità in un contesto visivamente premium.
+AutoHUB è una web application Java per il settore automotive premium. Integra in un unico ambiente la vendita di veicoli e prodotti automotive, il noleggio di supercar e la gestione dell'inventario da parte di amministratori e concessionari.
 
-**Obiettivi specifici:**
-- Permettere la navigazione del catalogo a utenti non registrati
-- Consentire ad utenti registrati di aggiungere prodotti al carrello, completare ordini con dati di spedizione e pagamento, e consultare lo storico ordini
-- Fornire all'amministratore una pannello di gestione per il CRUD del catalogo e la visualizzazione degli ordini per data e per cliente
+Il progetto si rivolge a clienti interessati ad auto sportive e di lusso, ricambi performance, accessori e noleggi a breve termine. L'applicazione è realizzata come progetto Maven WAR con Java 21, Jakarta Servlet/JSP, JSTL, MySQL e un datasource JNDI (`java:comp/env/jdbc/autohub`).
 
----
+Gli obiettivi funzionali sono:
 
-## 2. Analisi dei Competitor
+- consentire la consultazione pubblica del catalogo di vendita e dei veicoli a noleggio;
+- permettere agli utenti registrati di acquistare prodotti, prenotare noleggi e consultare i propri ordini e noleggi;
+- consentire ai concessionari di gestire autonomamente i veicoli di cui sono proprietari;
+- fornire all'amministratore una visione complessiva di prodotti, ordini, noleggi e posizioni dei veicoli attivi.
 
-### AutoScout24 (https://www.autoscout24.it)
+## 2. Analisi dei competitor
 
-Piattaforma specializzata nella compravendita di veicoli nuovi e usati. Consente ricerche tramite filtri avanzati (prezzo, chilometraggio, alimentazione, localit\u00e0) e mette in contatto acquirenti con venditori privati e concessionari.
+### AutoScout24
 
-**Punti di forza:** vasta gamma di veicoli, filtri avanzati, comparazione.
-**Limitazioni rispetto ad AutoHUB:** non vende componenti o accessori; nessuna gestione del carrello integrata.
+[AutoScout24](https://www.autoscout24.it) è focalizzato sulla ricerca e sulla compravendita di veicoli nuovi e usati. Offre filtri avanzati e un ampio inventario, ma non propone un flusso di e-commerce per ricambi né il noleggio integrato nella stessa esperienza.
 
-### Autodoc (https://www.auto-doc.it)
+### Autodoc
 
-E-commerce specializzato nella vendita di ricambi e componenti per automobili. Compatibilit\u00e0 per modello di veicolo, schede tecniche dettagliate, prezzi competitivi.
+[Autodoc](https://www.auto-doc.it) è un e-commerce specializzato in ricambi e accessori. Il suo punto di forza è la profondità del catalogo tecnico; AutoHUB si differenzia perché associa vendita di veicoli, accessori e noleggio con un'interfaccia orientata al segmento premium.
 
-**Punti di forza:** catalogo ricambi molto ampio, ricerca per targa/modello.
-**Limitazioni rispetto ad AutoHUB:** solo ricambi, no veicoli completi; interfaccia poco premium.
+### Turo
 
-### Turo (https://www.turo.com)
+[Turo](https://turo.com) propone il noleggio di veicoli tramite una piattaforma digitale. AutoHUB ne riprende il concetto di prenotazione, ma lo combina con un catalogo di vendita e con la gestione da parte dei concessionari. Il pannello amministrativo include inoltre una mappa dei noleggi attivi.
 
-Piattaforma online per il noleggio di auto tra privati. Gli utenti prenotano veicoli per periodi variabili; i proprietari gestiscono disponibilit\u00e0 e prezzi.
+### Posizionamento di AutoHUB
 
-**Punti di forza:** model\u00f f di sharing economy, flessibilit\u00e0 di prenotazione.
-**Limitazioni rispetto ad AutoHUB:** solo noleggio, nessun acquisto di prodotti fisici.
+AutoHUB si posiziona come hub automotive premium: unisce acquisto, noleggio e gestione dell'offerta dei concessionari, privilegiando supercar e veicoli di fascia alta. L'esperienza è completata da schede ricche di specifiche, gallerie di immagini e da un'interfaccia scura con accenti oro.
 
-**Posizionamento di AutoHUB:** AutoHUB si distingue combinando vendita di veicoli e componenti in un design visivamente lussuoso e un'esperienza d'acquisto completa (carrello, ordini, storico).
+## 3. Funzionalità del sito
 
----
+### Visitatore
 
-## 3. Funzionalit\u00e0 del Sito
+- Visualizza home, catalogo prodotti, dettaglio prodotto, catalogo noleggi e dettaglio del veicolo a noleggio.
+- Filtra il catalogo prodotti per ricerca, categoria, prezzo e ordinamento; filtra i noleggi per città.
+- Gestisce un carrello mantenuto in sessione (aggiunta, modifica quantità, rimozione e svuotamento).
+- Può registrarsi o accedere.
 
-Le funzionalit\u00e0 sono organizzate per tipo di utente:
+### Cliente registrato
 
-### Utente Non Registrato
-- Navigazione del catalogo prodotti (veicoli, componenti, accessori)
-- Ricerca per categoria, parola chiave, fascia di prezzo
-- Visualizzazione scheda prodotto dettagliata
-- Aggiunta prodotti al carrello (il carrello \u00e8 mantenuto in sessione)
-- Registrazione di un nuovo account
+- Completa il checkout con dati di spedizione e metodo di pagamento; l'ordine memorizza gli articoli, il prezzo storico e il totale.
+- Consulta storico e dettaglio dei propri ordini.
+- Prenota un veicolo scegliendo date, città/indirizzo di ritiro e note; il totale è calcolato sui giorni di noleggio.
+- Consulta storico e dettaglio dei propri noleggi.
 
-### Utente Registrato
-- Tutte le funzionalit\u00e0 dell'utente non registrato
-- Login e Logout
-- Checkout con inserimento dati di spedizione e metodo di pagamento
-- Conferma ordine e svuotamento automatico del carrello
-- Visualizzazione storico ordini
-- Visualizzazione dettaglio singolo ordine
+### Concessionario
+
+- Accede all'area concessionario attraverso il normale login con ruolo `dealer` o `concessionario`.
+- Aggiorna indirizzo e coordinate della propria sede; l'applicazione prova a geocodificare l'indirizzo tramite Nominatim/OpenStreetMap.
+- Gestisce soltanto i propri veicoli in vendita e a noleggio: inserimento, modifica ed eliminazione.
+- Carica da tre a cinque immagini per veicolo, salvate sotto `/images/products/` e registrate anche come lista JSON.
 
 ### Amministratore
-- Login e Logout separato (pannello `/admin`)
-- Dashboard con statistiche (prodotti attivi, ordini odierni, utenti registrati)
-- Creazione, visualizzazione, modifica e cancellazione (soft-delete) prodotti
-- Visualizzazione elenco ordini con filtro per data (da/a) e per cliente
-- Visualizzazione dettaglio ordine
 
----
+- Accede al pannello separato `/admin`.
+- Consulta dashboard, prodotti e ordini; può creare, modificare e cancellare logicamente i prodotti.
+- Consulta la pagina dei noleggi con veicoli, noleggi attivi e concessionari su una mappa Leaflet/CARTO; la posizione delle auto attive è simulata lato client.
+- Può eliminare veicoli a noleggio e aggiornare le coordinate di un veicolo.
 
 ## 4. Layout
 
-Il layout adotta un design a **colonna intera** con navigazione orizzontale fissa in alto per le pagine cliente, e un layout **sidebar + contenuto principale** per il pannello admin.
+Il sito pubblico usa una navbar sticky orizzontale con i collegamenti Home, Acquista, Noleggi, Carrello e area utente. Le pagine sono responsive e basate su Bootstrap: griglie di card per catalogo e noleggi, sidebar filtri nel catalogo, form per checkout e prenotazione, e galleria con specifiche per il dettaglio prodotto.
 
-**Pagine Cliente:**
 ```
-+--------------------------------------------------+
-|  NAVBAR: [AutoHUB] [Home] [Catalog] [Cart] [User]|
-+--------------------------------------------------+
-|                                                  |
-|   HERO SECTION (full-width, immagine sfondo)     |
-|                                                  |
-+--------------------------------------------------+
-|  FEATURED PRODUCTS GRID (3-4 colonne responsive) |
-+--------------------------------------------------+
-|  VALUES / ABOUT SECTION                          |
-+--------------------------------------------------+
-|  FOOTER                                          |
-+--------------------------------------------------+
++-----------------------------------------------------------+
+| Navbar: Home | Acquista | Noleggi | Carrello | Account   |
++-----------------------------------------------------------+
+| Hero / video promozionale                                 |
++-----------------------------------------------------------+
+| Sezioni editoriali e card in griglia                      |
+| [prodotto o veicolo] [prodotto o veicolo] [...]           |
++-----------------------------------------------------------+
+| Footer                                                     |
++-----------------------------------------------------------+
 ```
 
-**Pagina Catalogo:**
-```
-+------------+-----------------------------------+
-|  SIDEBAR   |   PRODUCT GRID                    |
-|  Filters   |   (3 colonne su desktop,          |
-|  - Search  |    2 su tablet, 1 su mobile)      |
-|  - Category|                                   |
-|  - Price   |   [Card] [Card] [Card]            |
-|  - Sort    |   [Card] [Card] [Card]            |
-+------------+-----------------------------------+
-```
+Il catalogo di vendita combina una sidebar per ricerca, categoria, fascia di prezzo e ordinamento con una griglia di prodotti. Il catalogo noleggi presenta card con città, concessionario, tariffa giornaliera e call to action per la prenotazione.
 
-**Pannello Admin:**
-```
-+----------+---------------------------------------+
-| SIDEBAR  |  MAIN CONTENT                         |
-| [Nav]    |  [Topbar con titolo e azioni]         |
-| Dashboard|  [Tabella / Form / Stats]             |
-| Products |                                       |
-| Orders   |                                       |
-| Logout   |                                       |
-+----------+---------------------------------------+
-```
+Le aree amministratore e concessionario adottano una sidebar fissa a sinistra, topbar e contenuto principale. L'area admin mostra tabelle, statistiche e la mappa dei noleggi; l'area concessionario offre dashboard e form per i due inventari.
 
----
+```
++----------------+------------------------------------------+
+| Sidebar        | Topbar                                   |
+| - Dashboard    +------------------------------------------+
+| - Inventario   | Tabelle, form, statistiche oppure mappa  |
+| - Noleggi      |                                          |
+| - Logout       |                                          |
++----------------+------------------------------------------+
+```
 
 ## 5. Tema
 
-Il tema visivo di AutoHUB \u00e8 **lusso automobilistico scuro** – ispirato all'estetica delle case automobilistiche di lusso come Mansory e Legendary Motorcar.
+Il tema è un "luxury automotive dark": superfici scure, contrasti netti e dettagli oro richiamano gli interni e le finiture di una supercar. Le immagini dei veicoli, il video promozionale in homepage e le gallerie dei dettagli mantengono l'attenzione sul prodotto.
 
-**Metafora visiva:** L'interfaccia richiama l'interno di una supercar di notte – carbonio nero, finiture dorate, illuminazione soffusa. Ogni elemento grafico trasmette esclusivit\u00e0 e precisione tecnica.
+La tipografia usa Playfair Display per brand e titoli, per dare un carattere editoriale e premium, e Montserrat per testi, navigazione e controlli. Bootstrap 5 fornisce la base responsive; Bootstrap Icons identifica azioni e sezioni; Leaflet con tile CARTO dark è impiegato per la mappa amministrativa.
 
-**Caratteristiche del tema:**
-- Sfondi quasi-neri (`#0A0A0A`, `#1A1A1A`) per massimizzare il contrasto
-- Accenti oro (`#D4AF37`) per highlights, prezzi, pulsanti CTA
-- Tipografia serif elegante (Playfair Display) per titoli
-- Tipografia sans-serif moderna (Montserrat) per corpo e navigazione
-- Bordi sottili con rgba gold per separatori e card
-- Immagini di veicoli ad alta risoluzione da Pexels
+## 6. Palette dei colori
 
----
+| Ruolo | Colore | Valore | Uso principale |
+|---|---|---:|---|
+| Sfondo principale | Obsidian Black | `#0A0A0A` | Corpo del sito |
+| Sfondo pannelli | Charcoal | `#1A1A1A` | Card, form e pannelli |
+| Sfondo secondario | Dark Grey | `#2A2A2A` | Stati e componenti secondari |
+| Accento | Gold | `#D4AF37` | CTA, titoli, prezzi e marker |
+| Accento hover | Gold Light | `#F0C040` | Hover e risalto |
+| Accento secondario | Copper | `#B87333` | Stato in attesa |
+| Testo principale | White | `#FFFFFF` | Titoli e contenuti importanti |
+| Testo attenuato | Muted Grey | `#888888` | Metadati e descrizioni |
+| Successo | Green | `#5CB85C` | Disponibilità e stati positivi |
+| Errore | Coral Red | `#FF6B6B` | Errori e azioni distruttive |
+| Bordo | Gold alpha | `rgba(212,175,55,0.20)` | Separazione di card e pannelli |
 
-## 6. Palette dei Colori
-
-| Ruolo | Nome | Hex | Utilizzo |
-|-------|------|-----|---------|
-| Sfondo primario | Obsidian Black | `#0A0A0A` | Background body |
-| Sfondo secondario | Charcoal | `#1A1A1A` | Card, pannelli, tabelle |
-| Accento primario | Gold | `#D4AF37` | Titoli, bottoni, prezzi, highlights |
-| Accento secondario | Bronze | `#B8941F` | Hover bottoni, bordi attivi |
-| Testo primario | Pure White | `#FFFFFF` | Intestazioni, testo importante |
-| Testo secondario | Silver | `#CCCCCC` | Corpo testo, descrizioni |
-| Testo muted | Gray | `#888888` | Label, metadata |
-| Successo | Emerald | `#5CB85C` | Stato "Active", indicatori positivi |
-| Errore | Coral Red | `#FF6B6B` | Errori, "Out of Stock" |
-| Bordo card | Gold-alpha | `rgba(212,175,55,0.15)` | Bordi sottili elementi |
-
-**Tipografia:**
-- Playfair Display: 400, 700 (titoli, brand)
-- Montserrat: 300, 400, 600 (corpo, nav, bottoni)
-
----
-
-## 7. Diagramma Navigazionale
+## 7. Diagramma navigazionale
 
 ```
-                        [HOME]
-                           |
-          +----------------+----------------+
-          |                |                |
-       [CATALOG]        [CART]         [LOGIN/REGISTER]
-          |                |                |
-      [PRODUCT         [CHECKOUT]      [MY ORDERS]
-       DETAIL]             |                |
-          |          [ORDER CONFIRM]   [ORDER DETAIL]
-          |
-     [ADD TO CART]
-     (AJAX, sessione)
+                                  [HOME]
+                         /          |          \
+                 [ACQUISTA]     [NOLEGGI]    [LOGIN / REGISTRAZIONE]
+                     |              |                 |
+            [DETTAGLIO PRODOTTO] [DETTAGLIO]       [AREA UTENTE]
+                     |              |              /          \
+                [CARRELLO]     [PRENOTAZIONE] [ORDINI]    [I MIEI NOLEGGI]
+                     |              |             |              |
+                 [CHECKOUT] [CONFERMA NOLEGGIO] [DETTAGLIO] [DETTAGLIO]
+                     |
+             [CONFERMA ORDINE]
 
-                     [ADMIN LOGIN]
-                           |
-                    [ADMIN DASHBOARD]
-                    /               \
-           [PRODUCTS]            [ORDERS]
-           /       \                |
-     [NEW/EDIT]  [VIEW/DELETE]  [VIEW DETAIL]
+        [AREA CONCESSIONARIO]                 [PANNELLO ADMIN]
+          /        |        \                 /      |       \
+ [Dashboard] [Vendita] [Noleggio]       [Dashboard][Prodotti][Ordini]
+              |           |                           |
+         [Nuovo/Modifica] [Nuovo/Modifica]       [Mappa noleggi]
 ```
 
-**Legenda:**
-- Pagine pubbliche (nessun login richiesto): Home, Catalog, Product Detail, Cart, Login, Register
-- Pagine protette (login utente): Checkout, Order Confirmation, My Orders, Order Detail
-- Pagine admin (login admin): Admin Dashboard, Products CRUD, Orders view
+Le pagine checkout, ordini, dettaglio ordine, prenotazione, conferma e storico noleggi richiedono autenticazione cliente. L'area concessionario verifica il ruolo applicativo all'ingresso di ogni servlet. Tutte le rotte `/admin/*`, ad eccezione della gestione del login effettuata dal filtro, sono riservate alla sessione amministrativa.
 
----
-
-## 8. Diagramma Navigazionale con le Servlet
+## 8. Diagramma navigazionale con le Servlet
 
 ```
-Browser                     Servlet                         JSP / JSON
--------                     -------                         ----------
+Rotta / metodo                         Servlet                              Vista / risultato
+GET  /home                             HomeServlet                          home.jsp
+GET  /catalog                          CatalogServlet                       catalog.jsp
+GET  /product?id=                      ProductDetailServlet                 product-detail.jsp
+GET|POST /cart                         CartServlet                          cart.jsp / JSON per azioni AJAX
+GET|POST /register                     RegisterServlet                      register.jsp / redirect login
+GET|POST /login                        LoginServlet                         login.jsp / redirect per ruolo
+POST /logout                           LogoutServlet                        redirect home
+GET|POST /checkout              [U]   CheckoutServlet                      checkout.jsp / conferma ordine
+GET  /order-confirmation        [U]   OrderConfirmationServlet             order-confirmation.jsp
+GET  /orders                    [U]   OrderHistoryServlet                  order-history.jsp
+GET  /order-detail?id=          [U]   OrderDetailServlet                   order-detail.jsp
 
-GET /home              --> HomeServlet                --> home.jsp
-GET /catalog           --> CatalogServlet             --> catalog.jsp
-GET /product?id=X      --> ProductDetailServlet       --> product-detail.jsp
-GET /cart              --> CartServlet (GET)           --> cart.jsp
-POST /cart (AJAX)      --> CartServlet (POST)          --> JSON response
-  action=add
-  action=update
-  action=remove
-  action=clear
-GET /register          --> RegisterServlet (GET)       --> register.jsp
-POST /register         --> RegisterServlet (POST)      --> register.jsp (errori) |
-                                                            redirect /login (ok)
-GET /login             --> LoginServlet (GET)          --> login.jsp
-POST /login            --> LoginServlet (POST)         --> login.jsp (errore) |
-                                                            redirect /home (ok)
-POST /logout           --> LogoutServlet               --> redirect /home
-GET /checkout          --> CheckoutServlet (GET)  [*] --> checkout.jsp
-POST /checkout         --> CheckoutServlet (POST) [*] --> redirect /order-confirmation
-GET /order-confirmation--> OrderConfirmationServlet   --> order-confirmation.jsp
-GET /orders            --> OrderHistoryServlet    [*] --> order-history.jsp
-GET /order-detail?id=X --> OrderDetailServlet     [*] --> order-detail.jsp
+GET  /rentals                          RentalsServlet                       rentals.jsp
+GET  /rental-detail?id=                RentalVehicleDetailServlet           rental-detail.jsp
+GET|POST /rental-booking        [U]   RentalBookingServlet                 rental-booking.jsp / conferma
+GET  /rental-confirmation       [U]   RentalConfirmationServlet            rental-confirmation.jsp
+GET  /my-rentals                [U]   RentalHistoryServlet                 rental-history.jsp
 
-GET /admin/login       --> AdminLoginServlet           --> admin/login.jsp
-POST /admin/login      --> AdminLoginServlet           --> admin/login.jsp (err) |
-                                                            redirect /admin/dashboard
-GET /admin/dashboard   --> AdminDashboardServlet  [A] --> admin/dashboard.jsp
-GET /admin/products    --> AdminProductServlet    [A] --> admin/products.jsp
-GET /admin/products?action=new  --> AdminProductServlet --> admin/product-form.jsp
-GET /admin/products?action=edit --> AdminProductServlet --> admin/product-form.jsp
-GET /admin/products?action=view --> AdminProductServlet --> admin/product-detail.jsp
-POST /admin/products   --> AdminProductServlet    [A] --> redirect /admin/products
-  action=create | update | delete
-GET /admin/orders      --> AdminOrdersServlet     [A] --> admin/orders.jsp
-  ?fromDate=&toDate=&userId=
-POST /admin/logout     --> AdminLogoutServlet          --> redirect /admin/login
+GET|POST /dealer/dashboard      [D]   DealerDashboardServlet               dealer/dashboard.jsp
+GET|POST /dealer/sale-vehicles  [D]   DealerProductServlet                 elenco o vehicle-form.jsp
+GET|POST /dealer/rental-vehicles[D]   DealerRentalVehicleServlet           elenco o vehicle-form.jsp
+
+GET|POST /admin/login                 AdminLoginServlet                    admin/login.jsp / dashboard
+GET  /admin/dashboard           [A]   AdminDashboardServlet                admin/dashboard.jsp
+GET|POST /admin/products        [A]   AdminProductServlet                  elenco, dettaglio o form prodotto
+GET  /admin/orders              [A]   AdminOrdersServlet                   admin/orders.jsp
+GET|POST /admin/rentals         [A]   AdminRentalsServlet                  admin/rentals-map.jsp
+POST /admin/rentals/update-location[A] UpdateVehicleLocationServlet         redirect noleggi admin
+GET|POST /admin/logout          [A]   AdminLogoutServlet                   redirect login admin
 ```
 
-**Legenda:**
-- `[*]` Protetto da `AuthFilter` (richiede sessionUser in sessione)
-- `[A]` Protetto da `AdminAuthFilter` (richiede sessionAdmin in sessione)
+Legenda: `[U]` protetta da `AuthFilter`; `[A]` protetta da `AdminAuthFilter`; `[D]` controllata dalla verifica del ruolo concessionario nelle servlet. `CharacterEncodingFilter` applica UTF-8 a tutte le richieste. Le azioni del carrello sono `add`, `update`, `remove` e `clear`.
 
----
-
-## 9. Schema ER della Base di Dati
+## 9. Schema ER della base di dati
 
 ```
-+------------------+        +-------------------+
-|      users       |        |     products      |
-+------------------+        +-------------------+
-| PK id            |        | PK id             |
-|    username      |        |    name           |
-|    email         |        |    description    |
-|    password_hash |        |    price          |
-|    full_name     |        |    stock_quantity |
-|    phone         |        |    category       |
-|    address       |        |    image_url      |
-|    city          |        |    is_deleted     |
-|    postal_code   |        |    created_at     |
-|    country       |        |    updated_at     |
-|    role          |        +-------------------+
-|    created_at    |                  |
-+------------------+                  | (nullable FK)
-         |                            |
-         | 1                          |
-         |                            |
-         | N                          |
-+------------------+        +-------------------+
-|      orders      |        |   order_items     |
-+------------------+        +-------------------+
-| PK id            |------->| PK id             |
-| FK user_id       | 1   N  | FK order_id       |
-|    status        |        | FK product_id (?) |
-|    shipping_name |        |    product_name   |<-- stored at purchase time
-|    shipping_addr |        |    product_price  |<-- stored at purchase time
-|    shipping_city |        |    quantity       |
-|    shipping_post |        |    subtotal       |
-|    shipping_ctry |        +-------------------+
-|    payment_method|
-|    total_amount  |
-|    created_at    |
-+------------------+
+  USERS                                      PRODUCTS
++--------------------------+                +---------------------------+
+| PK id                    |  1          N  | PK id                     |
+| username, email          |<---------------| dealer_id (logico)         |
+| password_hash, role      |                | nome, categoria, prezzo   |
+| sede e coordinate        |                | stock, immagini, specs    |
++------------+-------------+                | is_deleted                |
+             | 1                            +-------------+-------------+
+             | N                                          | 0..1
+          ORDERS                                        ORDER_ITEMS
++---------------------------+                 +--------------------------+
+| PK id                     | 1             N | PK id                    |
+| FK user_id                |---------------->| FK order_id              |
+| spedizione, pagamento     |                 | FK product_id, nullable  |
+| stato, totale, created_at |                 | nome/prezzo storico, q.tà|
++---------------------------+                 +--------------------------+
+
+  USERS                                    RENTAL_VEHICLES
++--------------------------+               +---------------------------+
+| PK id                    | 1         N   | PK id                     |
+| cliente / concessionario |<--------------| dealer_id (logico)         |
++------------+-------------+               | dati, prezzo/giorno        |
+             | 1                           | città, coordinate, stato  |
+             | N                           +-------------+-------------+
+          RENTALS                                        | 1
++---------------------------+                            | N
+| PK id                     |----------------------------+
+| FK user_id                |       FK vehicle_id
+| date, luogo ritiro        |
+| giorni, totale, stato     |
+| note, created_at          |
++---------------------------+
 ```
 
-**Note sulla struttura:**
-- `order_items.product_name` e `order_items.product_price` preservano il nome e il prezzo al momento dell'acquisto, indipendentemente da eventuali modifiche successive al prodotto.
-- `order_items.product_id` è nullable (FK con ON DELETE SET NULL): se un prodotto viene cancellato (soft-delete), rimane nella tabella `order_items` con `product_id = NULL`, preservando la history degli ordini.
-- `products.is_deleted` implementa il soft-delete: i prodotti "cancellati" non appaiono nel catalogo ma restano referenziati negli ordini storici.
+Entità e relazioni principali:
 
-**Database:** MySQL 8.0+, charset `utf8mb4`, engine `InnoDB`.
-**JNDI Name:** `java:comp/env/jdbc/autohub`
+- `users` contiene clienti, concessionari e amministratori; il ruolo distingue `customer`, `dealer`/`concessionario` e `admin`. Per le sedi sono disponibili indirizzo, città, CAP, nazione, latitudine e longitudine.
+- `products` contiene prodotti e veicoli in vendita, comprese specifiche tecniche, più immagini (`image_url` e `image_urls`) e il proprietario `dealer_id`. La cancellazione è logica tramite `is_deleted`.
+- `orders` appartiene a un utente; `order_items` associa gli articoli ordinati e conserva nome e prezzo al momento dell'acquisto. `product_id` è nullable con `ON DELETE SET NULL`.
+- `rental_vehicles` contiene i veicoli disponibili per il noleggio, il concessionario proprietario, località e coordinate correnti.
+- `rentals` collega cliente e veicolo, con periodo, dati di ritiro, importo e stato della prenotazione.
 
----
+Le chiavi esterne effettivamente dichiarate nello script iniziale sono quelle di `orders`, `order_items` e `rentals`. I campi `dealer_id`, introdotti anche dalle migrazioni per database esistenti, sono gestiti dall'applicazione come riferimenti logici a `users.id`.
+
+Il database usa MySQL 8+, InnoDB e charset `utf8mb4`.
 
 ## 10. Repository GitHub
 
-Il codice sorgente del progetto è disponibile nel seguente repository pubblico:
+Il codice sorgente è disponibile nel repository GitHub configurato per il progetto:
 
-**URL:** [https://github.com/YOUR_USERNAME/autohub](https://github.com/YOUR_USERNAME/autohub)
+[https://github.com/Mvmbo/projectAUTOHUB](https://github.com/Mvmbo/projectAUTOHUB)
 
-> Sostituire `YOUR_USERNAME` con il proprio username GitHub prima della consegna.
-
-**Istruzioni per il repository:**
-- Il repository deve essere **pubblico**
-- Effettuare commit a grana fine (un commit per ogni funzionalità o fix significativo)
-- La struttura del repository deve rispettare la struttura Maven del progetto
-
----
-
-## 11. Come Aggiungere GIF, Video e Immagini Multiple
-
-Questa sezione descrive come implementare contenuti multimediali nel progetto AutoHUB.
-
-### 11.1 Struttura delle Cartelle
-
-Creare le seguenti cartelle sotto `src/main/webapp/`:
-
-```
-webapp/
-├── images/
-│   ├── products/         # Immagini prodotti
-│   ├── hero/             # Immagini per hero section
-│   └── icons/            # Icone personalizzate
-├── videos/
-│   ├── hero-cars.mp4     # Video di sfondo homepage
-│   └── promo.mp4        # Video presentazione
-└── gifs/
-    └── animations/       # GIF animate
-```
-
-### 11.2 Implementare Video Background nell'Hero
-
-Nella home page (`home.jsp`), il video di sfondo deve:
-- Essere **mutato** (`muted`)
-- Essere in **autoplay** (`autoplay`)
-- Essere in **loop** (`loop`)
-- Avere un **poster** come fallback
-
-```html
-<video class="hero-video" autoplay muted loop playsinline
-       poster="https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg">
-  <source src="${pageContext.request.contextPath}/videos/hero-cars.mp4" type="video/mp4">
-</video>
-```
-
-**CSS necessario:**
-```css
-.hero-video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-}
-```
-
-### 11.3 Aggiungere GIF Animate
-
-Le GIF possono essere utilizzate per:
-- Loader/Spinner animati
-- Animazioni di feedback (es. conferma acquisto)
-- Elementi decorativi
-
-```html
-<img src="${pageContext.request.contextPath}/gifs/loading.gif"
-     alt="Caricamento in corso..." class="loading-gif">
-```
-
-### 11.4 Implementare Carousel di Immagini
-
-Per il carousel dei prodotti, utilizzare Bootstrap come mostrato in `product-detail.jsp`:
-
-```html
-<div id="productCarousel" class="carousel slide" data-bs-ride="false">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="immagine1.jpg" alt="Vista 1">
-    </div>
-    <div class="carousel-item">
-      <img src="immagine2.jpg" alt="Vista 2">
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button"
-          data-bs-target="#productCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button"
-          data-bs-target="#productCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div>
-```
-
-### 11.5 Sezione Video Presentazione
-
-Per aggiungere una sezione video (es. homepage):
-
-```html
-<div class="video-wrapper">
-  <div class="video-placeholder" id="videoPlaceholder">
-    <i class="bi bi-play-circle-fill"></i>
-    <p>Clicca per guardare il video</p>
-  </div>
-  <iframe id="promoVideo" style="display:none;"
-          src="" data-src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1"
-          frameborder="0" allowfullscreen>
-  </iframe>
-</div>
-```
-
-```javascript
-document.getElementById('videoPlaceholder').addEventListener('click', function() {
-  const iframe = document.getElementById('promoVideo');
-  iframe.src = iframe.dataset.src;
-  iframe.style.display = 'block';
-  this.style.display = 'none';
-});
-```
-
-### 11.6 Immagini Multiple per Prodotto
-
-Per supportare immagini multiple, aggiungere una colonna `image_urls` nella tabella products (formato JSON):
-
-```sql
-ALTER TABLE products ADD COLUMN image_urls TEXT;
-
--- Esempio JSON:
--- ["img1.jpg", "img2.jpg", "img3.jpg"]
-```
-
-Nel JSP, iterare sull'array JSON per generare il carousel. La colonna `image_urls` è già presente nella tabella `rental_vehicles`.
-
-### 11.7 Best Practices
-
-1. **Formati video raccomandati:** MP4 (H.264), WebM
-2. **Risoluzione massima:** 1920x1080 per hero video
-3. **Peso massimo:** 10MB per video (ottimizzare per web)
-4. **Immagini:** Formato JPEG per foto, PNG per grafiche con trasparenza
-5. **Lazy loading:** Utilizzare `loading="lazy"` per immagini fuori viewport
-6. **Fallback:** Sempre fornire un'immagine statica come `poster` per i video
-
-### 11.8 Risorse Esterno Gratuite
-
-- **Pexels:** https://www.pexels.com (foto e video gratuiti)
-- **Unsplash:** https://www.unsplash.com (foto)
-- **Coverr:** https://coverr.co (video gratuiti)
-
----
-
-*Documento di Website Design – AutoHUB*
-*Tecnologie Software per il Web, A.A. 2025/2026*
-*Università degli Studi di Salerno*
+La struttura segue il modello Maven: sorgenti Java in `src/main/java`, JSP e risorse web in `src/main/webapp`, script SQL in `sql/` e build WAR tramite `pom.xml`.
