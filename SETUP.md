@@ -1,57 +1,54 @@
-# AutoHUB – Setup and Deployment Guide
+# AutoHUB – Guida di installazione e avvio
 
-## Prerequisites
+## Requisiti
 
-| Tool | Version |
-|------|---------|
-| JDK | 17 (required) |
-| Apache Tomcat | 11.x (Jakarta EE 11 compatible) |
+| Componente | Versione richiesta |
+|---|---|
+| JDK | 21 |
+| Apache Tomcat | 11.x |
 | MySQL | 8.0+ |
-| phpMyAdmin | 5+ (optional, GUI alternative) |
 | Maven | 3.8+ |
-| IntelliJ IDEA | 2023.x+ (recommended) |
+| Browser moderno | Per Bootstrap, Leaflet e risorse CDN |
 
-> **Important:** Tomcat 11 requires Jakarta EE 11 (Jakarta Servlet API 6.1.0). All servlets use `jakarta.servlet.*` imports (not `javax.servlet.*`).
+Il progetto produce un file WAR ed usa Jakarta Servlet 6.1, JSP/JSTL e MySQL Connector/J 9.1.0. I sorgenti importano `jakarta.servlet.*`, quindi non sono compatibili con Tomcat 9 o precedente.
 
----
+## 1. Preparare il database
 
-## Step 1 – Database Setup
+### Installazione da zero
 
-### Option A: Using phpMyAdmin
+Eseguire dalla radice del repository:
 
-1. Open phpMyAdmin in your browser (usually `http://localhost/phpmyadmin`).
-2. Click **SQL** in the top menu.
-3. Paste the entire contents of `sql/autohub.sql` and click **Go**.
-
-This will:
-- Create the `autohub` database
-- Create `users`, `products`, `orders`, `order_items` tables
-- Insert the default admin user (`admin` / `admin123`)
-- Insert 10 sample products
-
-### Option B: Using MySQL CLI
-
-```bash
-mysql -u root -p < sql/autohub.sql
+```powershell
+mysql -u root -p < sql\autohub.sql
 ```
 
----
+In alternativa, con phpMyAdmin, importare il file `sql/autohub.sql`. Lo script crea il database `autohub` con codifica `utf8mb4`, le tabelle `users`, `products`, `orders`, `order_items`, `rental_vehicles` e `rentals`, oltre ai dati dimostrativi.
 
-## Step 2 – Tomcat DataSource Configuration
+### Aggiornare un database già esistente
 
-### 2.1 Add the MySQL JDBC Driver to Tomcat
+Se il database è stato creato con una versione precedente del progetto, eseguire anche le migrazioni seguenti, solo se le relative colonne non sono già presenti:
 
-Download **MySQL Connector/J 8.3.x** and place the JAR in Tomcat's `lib/` folder:
-
+```powershell
+mysql -u root -p autohub < sql\dealer-owner-migration.sql
+mysql -u root -p autohub < sql\dealer-coordinates-migration.sql
 ```
-$CATALINA_HOME/lib/mysql-connector-j-8.3.0.jar
-```
 
-Download from: https://dev.mysql.com/downloads/connector/j/
+Le migrazioni aggiungono `dealer_id` a prodotti e veicoli a noleggio, e le coordinate geografiche dei concessionari (`latitude`, `longitude`) in `users`.
 
-### 2.2 Configure the DataSource
+### Account iniziali
 
-Edit `$CATALINA_HOME/conf/context.xml` and add inside `<Context>`:
+| Ruolo | Username | Password |
+|---|---|---|
+| Amministratore | `admin` | `admin123` |
+| Concessionario Milano | `dealer_milano` | `admin123` |
+| Concessionario Roma | `dealer_roma` | `admin123` |
+| Altri concessionari seed | `dealer_napoli`, `dealer_firenze`, `dealer_torino`, `dealer_bologna`, `dealer_verona`, `dealer_bari` | `admin123` |
+
+Gli utenti cliente possono essere creati dalla pagina di registrazione. Per ragioni di sicurezza, cambiare le credenziali di esempio prima di usare l'applicazione in un ambiente esposto.
+
+## 2. Configurare il datasource Tomcat
+
+Il progetto include già [context.xml](C:\Users\rosal\Desktop\projectAUTOHUB\src\main\webapp\META-INF\context.xml), che definisce la risorsa JNDI `jdbc/autohub` per MySQL locale. Aggiornare i campi `username` e `password` se l'utente MySQL non è `root` senza password.
 
 ```xml
 <Resource
@@ -59,150 +56,145 @@ Edit `$CATALINA_HOME/conf/context.xml` and add inside `<Context>`:
   auth="Container"
   type="javax.sql.DataSource"
   driverClassName="com.mysql.cj.jdbc.Driver"
-  url="jdbc:mysql://localhost:3306/autohub?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"
+  url="jdbc:mysql://localhost:3306/autohub?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;connectionCollation=utf8mb4_unicode_ci"
   username="root"
-  password="YOUR_MYSQL_PASSWORD"
+  password=""
   maxTotal="20"
   maxIdle="10"
   maxWaitMillis="10000"
+  validationQuery="SELECT 1"
+  testOnBorrow="true"
 />
 ```
 
-Replace `YOUR_MYSQL_PASSWORD` with your actual MySQL root password (leave empty if no password).
+Il driver MySQL deve essere disponibile al classloader di Tomcat. Copiare il JAR `mysql-connector-j-9.1.0.jar` (o una versione compatibile) in:
 
-> **Note:** The project's own `src/main/webapp/META-INF/context.xml` provides the same configuration and is automatically used by Tomcat when the WAR is deployed. You only need to edit the global `conf/context.xml` if you prefer a server-level setup.
+```text
+%CATALINA_HOME%\lib\
+```
 
----
+Riavviare Tomcat dopo ogni modifica al driver o al datasource.
 
-## Step 3 – IntelliJ IDEA Setup
+## 3. Configurare HTTPS
 
-### 3.1 Import the Project
+Il file [web.xml](C:\Users\rosal\Desktop\projectAUTOHUB\src\main\webapp\WEB-INF\web.xml) applica `CONFIDENTIAL` a tutte le rotte. Configurare quindi un connettore HTTPS in Tomcat, altrimenti le richieste HTTP possono essere rifiutate o reindirizzate a una porta SSL non configurata.
 
-1. Open IntelliJ IDEA.
-2. Choose **File → Open** and select the `projectAUTOHUB/project/` folder (containing `pom.xml`).
-3. IntelliJ will detect the Maven project and import it automatically. If prompted, click **Trust Project**.
+Per lo sviluppo locale, configurare un connettore SSL in `%CATALINA_HOME%\conf\server.xml` e accedere con `https://localhost:<porta>`. Per una prova esclusivamente in HTTP, rimuovere temporaneamente il blocco `security-constraint` da `web.xml`; non farlo in ambienti pubblici.
 
-### 3.2 Fix the JDK (resolves "JDK isn't specified" error)
+## 4. Importare ed eseguire con IntelliJ IDEA
 
-**Fix A – Project SDK:**
+1. Aprire in IntelliJ la cartella `C:\Users\rosal\Desktop\projectAUTOHUB`, quella che contiene `pom.xml`.
+2. Importare il progetto come Maven e impostare Project SDK e language level su JDK 21.
+3. Creare una configurazione **Tomcat Server > Local** con Tomcat 11.
+4. In **Deployment**, aggiungere l'artifact `autohub:war exploded`.
+5. Impostare il context path su `/autohub` (oppure `/` per la root) e avviare.
 
-1. Go to **File → Project Structure → Project**.
-2. Under **SDK**, select **JDK 17** from the dropdown. If not listed, click **Add SDK → JDK** and point it to your JDK 17 installation.
-3. Set **Language Level** to **17**.
-4. Click **Apply → OK**.
+## 5. Build e deploy manuale su Windows
 
-**Fix B – Module SDK:**
+Prima del deploy, completare le sezioni sul database, datasource e HTTPS. I comandi seguenti assumono che Tomcat sia installato in `C:\Tomcat11` e che il terminale sia aperto nella cartella che contiene `pom.xml`.
 
-1. Go to **File → Project Structure → Modules**.
-2. Select the `autohub` module.
-3. In the **Dependencies** tab, set the **Module SDK** to **JDK 17**.
-4. Click **Apply → OK**.
+### 1. Generare il file WAR
 
-**Fix C – Maven Reload:**
-
-1. Open the **Maven** tool window (right side panel, or View → Tool Windows → Maven).
-2. Click the **Reload All Maven Projects** button (circular arrow icon).
-
-### 3.3 Configure Tomcat in IntelliJ
-
-1. Go to **Run → Edit Configurations → + → Tomcat Server → Local**.
-2. Set the **Application server** to your Tomcat 11 installation.
-3. Click the **Deployment** tab → **+ → Artifact**.
-4. Select `autohub:war exploded`.
-5. Set the **Application context** to `/autohub` (or `/` for root).
-6. Click **Apply → Run**.
-
----
-
-## Step 4 – Build and Deploy
-
-### Build with Maven
-
-```bash
-cd projectAUTOHUB/project
+```powershell
 mvn clean package
 ```
 
-This produces `target/autohub.war`.
+Il comando:
 
-### Deploy to Tomcat (manual)
+- `clean` elimina la precedente cartella `target`, evitando di distribuire file prodotti da una build vecchia;
+- `package` compila il progetto, esegue le fasi di build configurate da Maven e crea il pacchetto WAR;
+- genera il file da distribuire: `target\autohub.war`.
 
-```bash
-cp target/autohub.war $CATALINA_HOME/webapps/
+### 2. Copiare il WAR nella cartella di deploy
+
+```powershell
+Copy-Item .\target\autohub.war C:\Tomcat11\webapps\autohub.war -Force
 ```
 
-Start Tomcat:
+Il comando copia il WAR in `webapps` con il nome `autohub.war`. L'opzione `-Force` sovrascrive il precedente WAR, se presente. Tomcat usa il nome del file per il context path: `autohub.war` corrisponde a `/autohub`.
 
-```bash
-$CATALINA_HOME/bin/startup.sh    # Linux/Mac
-$CATALINA_HOME\bin\startup.bat   # Windows
+Se si sta aggiornando una versione già avviata, fermare prima Tomcat e rimuovere la vecchia cartella estratta, così non restano file obsoleti:
+
+```powershell
+C:\Tomcat11\bin\shutdown.bat
+# Arresta Tomcat e libera i file dell'applicazione.
+
+Remove-Item -LiteralPath C:\Tomcat11\webapps\autohub -Recurse -Force
+# Elimina soltanto la directory estratta del deploy precedente.
+
+Copy-Item .\target\autohub.war C:\Tomcat11\webapps\autohub.war -Force
+# Copia il nuovo pacchetto da distribuire.
 ```
 
----
+### 3. Avviare Tomcat
 
-## Step 5 – Access the Application
-
-| Page | URL |
-|------|-----|
-| Customer site | `http://localhost:8080/autohub/` |
-| Admin panel | `http://localhost:8080/autohub/admin/login` |
-
-### Default Admin Credentials
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin123` |
-
----
-
-## Project Structure
-
-```
-projectAUTOHUB/project/
-├── pom.xml                          # Maven – groupId: com.autohub, artifactId: autohub, Java 17
-├── sql/
-│   └── autohub.sql                  # MySQL schema + seed data
-└── src/main/
-    ├── java/
-    │   ├── control/                 # Servlets (MVC Controller layer)
-    │   ├── model/                   # Model classes
-    │   ├── dao/                     # DAO layer (DBUtil uses jdbc/autohub JNDI)
-    │   └── filter/                  # Servlet Filters (Auth, AdminAuth, Encoding)
-    └── webapp/
-        ├── WEB-INF/
-        │   ├── web.xml              # Declares jdbc/autohub resource-ref, filters
-        │   └── view/                # JSPs (not directly accessible)
-        ├── META-INF/
-        │   └── context.xml          # MySQL DataSource definition
-        ├── styles/                  # External CSS (main.css, admin.css)
-        └── scripts/                 # External JS (cart.js, validation.js, catalog.js)
+```powershell
+C:\Tomcat11\bin\startup.bat
 ```
 
----
+`startup.bat` avvia il server Tomcat. Durante l'avvio, Tomcat rileva `webapps\autohub.war`, lo estrae in `webapps\autohub\` e pubblica automaticamente l'applicazione. I log di avvio sono disponibili in `C:\Tomcat11\logs\`.
 
-## Troubleshooting
+### 4. Aprire l'applicazione
 
-### "JDK isn't specified for module 'autohub'"
+Con un connettore HTTPS configurato sulla porta 8443, aprire:
 
-Follow Step 3.2 above (set SDK to JDK 17 in Project Structure → Modules).
+```text
+https://localhost:8443/autohub/home
+```
 
-### MySQL Connection Refused
+Il progetto richiede HTTPS in [web.xml](C:\Users\rosal\Desktop\projectAUTOHUB\src\main\webapp\WEB-INF\web.xml). Se si rimuove temporaneamente il vincolo `CONFIDENTIAL` soltanto in sviluppo, l'URL HTTP diventa:
 
-- Ensure MySQL is running: `mysqladmin -u root -p status`
-- Verify the database exists: `mysql -u root -p -e "SHOW DATABASES;"`
-- Check username/password in `context.xml`
+```text
+http://localhost:8080/autohub/home
+```
 
-### JNDI Lookup Fails (ClassNotFoundException or NamingException)
+Se `mvn` non è riconosciuto, installare Maven e aggiungere la cartella `bin` alla variabile d'ambiente `PATH`, quindi riaprire il terminale.
 
-- Confirm `mysql-connector-j-*.jar` is in `$CATALINA_HOME/lib/` (not in `WEB-INF/lib/`)
-- Restart Tomcat after adding the JAR
+## 6. URL principali
 
-### 404 on JSP URLs
+Con context path `/autohub` e HTTPS configurato:
 
-JSPs are inside `WEB-INF/view/` to prevent direct access. All access must go through the servlets.
+| Funzione | URL |
+|---|---|
+| Home | `https://localhost:8443/autohub/home` |
+| Catalogo vendita | `https://localhost:8443/autohub/catalog` |
+| Catalogo noleggi | `https://localhost:8443/autohub/rentals` |
+| Login | `https://localhost:8443/autohub/login` |
+| Login amministratore | `https://localhost:8443/autohub/admin/login` |
+| Area concessionario | `https://localhost:8443/autohub/dealer/dashboard` |
 
-### Session / Login Issues
+La welcome page reindirizza a `/home`. Le JSP sono sotto `WEB-INF/view` e pertanto non sono raggiungibili direttamente dal browser.
 
-- Session timeout is 30 minutes (configurable in `web.xml`).
-- Make sure browser cookies are enabled.
+## 7. Note operative
+
+- Il carrello è memorizzato nella sessione; checkout, ordini e noleggi richiedono login. La sessione dura 30 minuti.
+- La registrazione permette di scegliere un account cliente o concessionario. Per i concessionari l'applicazione tenta di geocodificare l'indirizzo tramite il servizio Nominatim di OpenStreetMap; se il servizio non risponde, la registrazione resta valida ma senza coordinate.
+- Amministratori e concessionari caricano da 3 a 5 immagini per veicolo. Le immagini vengono salvate dal server in `src/main/webapp/images/products/` durante l'esecuzione in ambiente di sviluppo; assicurarsi che la directory di deploy sia scrivibile da Tomcat.
+- La mappa dei noleggi nel pannello admin usa Leaflet, tile CARTO e risorse caricate da CDN. Sono quindi necessarie connessioni internet per font, icone, Bootstrap, Leaflet e mappa.
+- Il video della home è incluso in `src/main/webapp/videos/hero-cars.mp4`.
+
+## Risoluzione dei problemi
+
+### `mvn` non riconosciuto
+
+Maven non è installato oppure la sua cartella `bin` non è nel `PATH`. Installare Maven, configurare `MAVEN_HOME`/`PATH` secondo il sistema operativo e aprire un nuovo terminale.
+
+### Errore di connessione MySQL o JNDI
+
+1. Verificare che MySQL sia attivo e che esista il database `autohub`.
+2. Controllare credenziali e URL nel `context.xml` incluso nel progetto.
+3. Verificare che MySQL Connector/J sia in `%CATALINA_HOME%\lib`.
+4. Riavviare Tomcat.
+
+### HTTP 403, redirect HTTPS non funzionante o pagina irraggiungibile
+
+Configurare un connettore HTTPS in Tomcat, perché `web.xml` richiede trasporto confidenziale per tutte le richieste. Controllare anche la porta HTTPS indicata nel connettore e usarla nell'URL.
+
+### Errore durante il caricamento immagini
+
+Controllare i permessi di scrittura di Tomcat sulla directory di deploy `images/products/`, il limite di 5 MB per singolo file e il limite di 25 MB per la richiesta multipart.
+
+### Pagine JSP in 404
+
+È previsto: le viste sono protette da `WEB-INF`. Accedere sempre tramite le servlet, ad esempio `/catalog`, `/rentals` o `/admin/dashboard`.
+
