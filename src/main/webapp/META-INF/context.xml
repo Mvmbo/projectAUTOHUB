@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <!--
+    MySQL DataSource for AutoHUB.
+    Place mysql-connector-j-*.jar in $CATALINA_HOME/lib/
+    then configure these values for your local MySQL installation.
+  -->
+  <Resource
+    name="jdbc/autohub"
+    auth="Container"
+    type="javax.sql.DataSource"
+    driverClassName="com.mysql.cj.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/autohub?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;connectionCollation=utf8mb4_unicode_ci"
+    username="root"
+    password=""
+    maxTotal="20"
+    maxIdle="10"
+    maxWaitMillis="10000"
+    validationQuery="SELECT 1"
+    testOnBorrow="true"
+    testWhileIdle="true"
+    timeBetweenEvictionRunsMillis="30000"
+    minEvictableIdleTimeMillis="60000"
+  />
+</Context>
