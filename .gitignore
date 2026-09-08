@@ -1,12 +1,21 @@
-# Cartelle degli IDE
-.idea/
-.vscode/
-
-# Build Maven (Java)
+# Maven
 target/
+
+# Compiled
 *.class
 *.jar
+*.war
 
-# Sistema
+# IntelliJ
+.idea/
+*.iml
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
 *.log
+
+# Key
+**/map-config.local.js
