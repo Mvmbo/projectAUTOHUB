@@ -60,61 +60,61 @@
       <div class="table-responsive">
         <table class="admin-table">
           <thead>
-            <tr>
-              <th>Veicolo</th>
-              <th>Marca</th>
-              <th>Città</th>
-              <th>Coordinate</th>
-              <th>Stato</th>
-              <th>Azioni</th>
-            </tr>
+          <tr>
+            <th>Veicolo</th>
+            <th>Marca</th>
+            <th>Città</th>
+            <th>Coordinate</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
           </thead>
           <tbody>
-            <c:forEach var="v" items="${vehicles}">
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <c:choose>
-                      <c:when test="${not empty v.imageUrl and fn:startsWith(v.imageUrl, '/images/products/')}">
-                        <img src="${pageContext.request.contextPath}${v.imageUrl}"
-                             alt="${v.name}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;">
-                      </c:when>
-                      <c:otherwise>
-                        <div class="d-flex align-items-center justify-content-center" style="width:50px; height:35px; background:#111; color:#666; border-radius:4px; font-size:0.62rem;">N/D</div>
-                      </c:otherwise>
-                    </c:choose>
-                    <span style="color:#fff;">${v.name}</span>
-                  </div>
-                </td>
-                <td>${v.brand}</td>
-                <td><span style="color:#D4AF37;"><i class="bi bi-geo-alt me-1"></i>${v.city}</span></td>
-                <td style="font-size:0.75rem; color:#888;">
+          <c:forEach var="v" items="${vehicles}">
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
                   <c:choose>
-                    <c:when test="${not empty v.latitude}">${v.latitude}, ${v.longitude}</c:when>
-                    <c:otherwise>N/A</c:otherwise>
+                    <c:when test="${not empty v.imageUrl and fn:startsWith(v.imageUrl, '/images/products/')}">
+                      <img src="${pageContext.request.contextPath}${v.imageUrl}"
+                           alt="${v.name}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;">
+                    </c:when>
+                    <c:otherwise>
+                      <div class="d-flex align-items-center justify-content-center" style="width:50px; height:35px; background:#111; color:#666; border-radius:4px; font-size:0.62rem;">N/D</div>
+                    </c:otherwise>
                   </c:choose>
-                </td>
-                <td>
-                  <c:choose>
-                    <c:when test="${v.available}"><span class="status-active">Disponibile</span></c:when>
-                    <c:otherwise><span class="status-deleted">Noleggiato</span></c:otherwise>
-                  </c:choose>
-                </td>
-                <td>
-                  <button class="btn-admin-outline btn-admin-sm"
-                          onclick="focusVehicle(${v.id}, ${not empty v.latitude ? v.latitude : 'null'}, ${not empty v.longitude ? v.longitude : 'null'})">
-                    <i class="bi bi-crosshair"></i>
+                  <span style="color:#fff;">${v.name}</span>
+                </div>
+              </td>
+              <td>${v.brand}</td>
+              <td><span style="color:#D4AF37;"><i class="bi bi-geo-alt me-1"></i>${v.city}</span></td>
+              <td style="font-size:0.75rem; color:#888;">
+                <c:choose>
+                  <c:when test="${not empty v.latitude}">${v.latitude}, ${v.longitude}</c:when>
+                  <c:otherwise>N/A</c:otherwise>
+                </c:choose>
+              </td>
+              <td>
+                <c:choose>
+                  <c:when test="${v.available}"><span class="status-active">Disponibile</span></c:when>
+                  <c:otherwise><span class="status-deleted">Noleggiato</span></c:otherwise>
+                </c:choose>
+              </td>
+              <td>
+                <button class="btn-admin-outline btn-admin-sm"
+                        onclick="focusVehicle(${v.id}, ${not empty v.latitude ? v.latitude : 'null'}, ${not empty v.longitude ? v.longitude : 'null'})">
+                  <i class="bi bi-crosshair"></i>
+                </button>
+                <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="display:inline; margin-left:0.4rem;">
+                  <input type="hidden" name="action" value="deleteVehicle">
+                  <input type="hidden" name="id" value="${v.id}">
+                  <button type="submit" class="btn-admin-danger btn-admin-sm" onclick="return confirm('Eliminare questo veicolo a noleggio?');">
+                    <i class="bi bi-trash"></i>
                   </button>
-                  <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="display:inline; margin-left:0.4rem;">
-                    <input type="hidden" name="action" value="deleteVehicle">
-                    <input type="hidden" name="id" value="${v.id}">
-                    <button type="submit" class="btn-admin-danger btn-admin-sm" onclick="return confirm('Eliminare questo veicolo a noleggio?');">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            </c:forEach>
+                </form>
+              </td>
+            </tr>
+          </c:forEach>
           </tbody>
         </table>
       </div>
@@ -166,136 +166,147 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/scripts/map-config.local.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const map = L.map('map').setView([42.5, 12.5], 6);
+  const map = L.map('map').setView([42.5, 12.5], 6);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
-  subdomains: 'abcd',
-  maxZoom: 19
-}).addTo(map);
+  const cartoKey = (typeof window.AUTOHUB_CARTO_KEY === 'string')
+          ? window.AUTOHUB_CARTO_KEY.trim()
+          : '';
 
-const carIcon = L.divIcon({
-  className: 'car-marker',
-  html: '<div class="car-marker-inner" style="background:#D4AF37; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(212,175,55,0.5);"><i class="bi bi-car-front" style="color:#000; font-size:12px;"></i></div>',
-  iconSize: [24, 24],
-  iconAnchor: [12, 12]
-});
+  const tileUrl = cartoKey
+          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png?key=' + encodeURIComponent(cartoKey)
+          : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-const dealerIcon = L.divIcon({
-  className: 'dealer-marker',
-  html: '<div style="background:#111; border:2px solid #D4AF37; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="bi bi-shop" style="color:#D4AF37; font-size:13px;"></i></div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 14]
-});
+  L.tileLayer(tileUrl, {
+    attribution: cartoKey
+            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: cartoKey ? 'abcd' : 'abc',
+    maxZoom: 19
+  }).addTo(map);
 
-const activeRentalCars = ${not empty activeRentalCarsJson ? activeRentalCarsJson : '[]'};
-const dealers = ${not empty dealersJson ? dealersJson : '[]'};
+  const carIcon = L.divIcon({
+    className: 'car-marker',
+    html: '<div class="car-marker-inner" style="background:#D4AF37; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(212,175,55,0.5);"><i class="bi bi-car-front" style="color:#000; font-size:12px;"></i></div>',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
 
-const markers = {};
-const dealerMarkers = {};
-const carMarkers = [];
-const routeBounds = [];
+  const dealerIcon = L.divIcon({
+    className: 'dealer-marker',
+    html: '<div style="background:#111; border:2px solid #D4AF37; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="bi bi-shop" style="color:#D4AF37; font-size:13px;"></i></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
 
-function safeText(value) {
-  return String(value == null ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+  const activeRentalCars = ${not empty activeRentalCarsJson ? activeRentalCarsJson : '[]'};
+  const dealers = ${not empty dealersJson ? dealersJson : '[]'};
 
-function hasValidDealerPosition(vehicle) {
-  return vehicle.hasDealerCoordinates === true &&
-    Number.isFinite(Number(vehicle.dealerLat)) &&
-    Number.isFinite(Number(vehicle.dealerLng));
-}
+  const markers = {};
+  const dealerMarkers = {};
+  const carMarkers = [];
+  const routeBounds = [];
 
-dealers.forEach(dealer => {
-  const lat = Number(dealer.lat);
-  const lng = Number(dealer.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    return;
+  function safeText(value) {
+    return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
   }
 
-  const marker = L.marker([lat, lng], {icon: dealerIcon, title: dealer.name}).addTo(map);
-  marker.bindPopup(
-    '<div style="padding:0.5rem;">' +
-      '<strong style="color:#D4AF37;">' + safeText(dealer.name || 'Concessionario') + '</strong><br>' +
-      '<span>' + safeText(dealer.address || 'Indirizzo non indicato') + '</span><br>' +
-      '<span>' + safeText(dealer.city || 'Citta non indicata') + '</span>' +
-    '</div>'
-  );
-  dealerMarkers[dealer.id] = marker;
-  routeBounds.push([lat, lng]);
-});
-
-activeRentalCars.forEach(v => {
-  if (!hasValidDealerPosition(v)) {
-    return;
+  function hasValidDealerPosition(vehicle) {
+    return vehicle.hasDealerCoordinates === true &&
+            Number.isFinite(Number(vehicle.dealerLat)) &&
+            Number.isFinite(Number(vehicle.dealerLng));
   }
-  routeBounds.push([Number(v.dealerLat), Number(v.dealerLng)]);
-});
 
-if (routeBounds.length > 0) {
-  map.fitBounds(routeBounds, {padding: [40, 40], maxZoom: 13});
-}
-
-function posizionaAuto(lat, lng, vehicle) {
-  const marker = L.marker([lat, lng], {icon: carIcon, title: vehicle.name}).addTo(map);
-  marker.bindPopup(
-    '<div style="padding:0.5rem;">' +
-      '<strong style="color:#D4AF37;">' + safeText(vehicle.brand) + ' ' + safeText(vehicle.name) + '</strong><br>' +
-      '<span>Cliente: ' + safeText(vehicle.userName || 'N/D') + '</span><br>' +
-      '<span>Concessionario: ' + safeText(vehicle.dealerName || 'N/D') + '</span><br>' +
-      '<span>Citta: ' + safeText(vehicle.city || 'N/D') + '</span><br>' +
-      '<span>Periodo: ' + safeText(vehicle.startDate || 'N/D') + ' - ' + safeText(vehicle.endDate || 'N/D') + '</span><br>' +
-      '<span>Noleggio #' + safeText(vehicle.rentalId) + '</span>' +
-    '</div>'
-  );
-  marker.vehicleId = vehicle.vehicleId;
-  carMarkers.push(marker);
-  markers[vehicle.vehicleId] = marker;
-}
-
-// Simula il movimento delle auto partendo dalla posizione del concessionario
-function simulaMovimento() {
-  function movimento() {
-    if (carMarkers.length === 0) {
-      // Posiziona tutte le auto alla posizione del concessionario di partenza
-      activeRentalCars.forEach(function(vehicle) {
-        if (!hasValidDealerPosition(vehicle)) {
-          return;
-        }
-        posizionaAuto(Number(vehicle.dealerLat), Number(vehicle.dealerLng), vehicle);
-      });
-    } else {
-      carMarkers.forEach(function(carMarker) {
-        var nuovaLatitudine = carMarker.getLatLng().lat + (Math.random() - 0.5) * 0.005;
-        var nuovaLongitudine = carMarker.getLatLng().lng + (Math.random() - 0.5) * 0.005;
-        carMarker.setLatLng([nuovaLatitudine, nuovaLongitudine]);
-      });
+  dealers.forEach(dealer => {
+    const lat = Number(dealer.lat);
+    const lng = Number(dealer.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
     }
-    setTimeout(movimento, 2000); // ogni 2 secondi
-  }
-  movimento();
-}
-simulaMovimento();
 
-function focusVehicle(id, lat, lng) {
-  const marker = markers[id];
-  if (marker) {
-    map.flyTo(marker.getLatLng(), 13, {duration: 1});
-    marker.openPopup();
-    return;
+    const marker = L.marker([lat, lng], {icon: dealerIcon, title: dealer.name}).addTo(map);
+    marker.bindPopup(
+            '<div style="padding:0.5rem;">' +
+            '<strong style="color:#D4AF37;">' + safeText(dealer.name || 'Concessionario') + '</strong><br>' +
+            '<span>' + safeText(dealer.address || 'Indirizzo non indicato') + '</span><br>' +
+            '<span>' + safeText(dealer.city || 'Citta non indicata') + '</span>' +
+            '</div>'
+    );
+    dealerMarkers[dealer.id] = marker;
+    routeBounds.push([lat, lng]);
+  });
+
+  activeRentalCars.forEach(v => {
+    if (!hasValidDealerPosition(v)) {
+      return;
+    }
+    routeBounds.push([Number(v.dealerLat), Number(v.dealerLng)]);
+  });
+
+  if (routeBounds.length > 0) {
+    map.fitBounds(routeBounds, {padding: [40, 40], maxZoom: 13});
   }
 
-  if (lat && lng) {
-    map.flyTo([lat, lng], 13, {duration: 1});
+  function posizionaAuto(lat, lng, vehicle) {
+    const marker = L.marker([lat, lng], {icon: carIcon, title: vehicle.name}).addTo(map);
+    marker.bindPopup(
+            '<div style="padding:0.5rem;">' +
+            '<strong style="color:#D4AF37;">' + safeText(vehicle.brand) + ' ' + safeText(vehicle.name) + '</strong><br>' +
+            '<span>Cliente: ' + safeText(vehicle.userName || 'N/D') + '</span><br>' +
+            '<span>Concessionario: ' + safeText(vehicle.dealerName || 'N/D') + '</span><br>' +
+            '<span>Citta: ' + safeText(vehicle.city || 'N/D') + '</span><br>' +
+            '<span>Periodo: ' + safeText(vehicle.startDate || 'N/D') + ' - ' + safeText(vehicle.endDate || 'N/D') + '</span><br>' +
+            '<span>Noleggio #' + safeText(vehicle.rentalId) + '</span>' +
+            '</div>'
+    );
+    marker.vehicleId = vehicle.vehicleId;
+    carMarkers.push(marker);
+    markers[vehicle.vehicleId] = marker;
   }
-}
+
+  // Simula il movimento delle auto partendo dalla posizione del concessionario
+  function simulaMovimento() {
+    function movimento() {
+      if (carMarkers.length === 0) {
+        // Posiziona tutte le auto alla posizione del concessionario di partenza
+        activeRentalCars.forEach(function(vehicle) {
+          if (!hasValidDealerPosition(vehicle)) {
+            return;
+          }
+          posizionaAuto(Number(vehicle.dealerLat), Number(vehicle.dealerLng), vehicle);
+        });
+      } else {
+        carMarkers.forEach(function(carMarker) {
+          var nuovaLatitudine = carMarker.getLatLng().lat + (Math.random() - 0.5) * 0.005;
+          var nuovaLongitudine = carMarker.getLatLng().lng + (Math.random() - 0.5) * 0.005;
+          carMarker.setLatLng([nuovaLatitudine, nuovaLongitudine]);
+        });
+      }
+      setTimeout(movimento, 2000); // ogni 2 secondi
+    }
+    movimento();
+  }
+  simulaMovimento();
+
+  function focusVehicle(id, lat, lng) {
+    const marker = markers[id];
+    if (marker) {
+      map.flyTo(marker.getLatLng(), 13, {duration: 1});
+      marker.openPopup();
+      return;
+    }
+
+    if (lat && lng) {
+      map.flyTo([lat, lng], 13, {duration: 1});
+    }
+  }
 </script>
 </body>
 </html>
