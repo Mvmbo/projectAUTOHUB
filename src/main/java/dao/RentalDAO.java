@@ -296,4 +296,271 @@ public class RentalDAO {
         }
     }
 
-    
+    public void updateVehicleLocation(int vehicleId, BigDecimal lat, BigDecimal lng, String city) throws SQLException {
+        String sql = "UPDATE rental_vehicles SET latitude = ?, longitude = ?, city = ? WHERE id = ?";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setBigDecimal(1, lat);
+            ps.setBigDecimal(2, lng);
+            ps.setString(3, city);
+            ps.setInt(4, vehicleId);
+            ps.executeUpdate();
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
+    public void updateVehicleAvailability(int vehicleId, boolean available) throws SQLException {
+        String sql = "UPDATE rental_vehicles SET is_available = ? WHERE id = ?";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setBoolean(1, available);
+            ps.setInt(2, vehicleId);
+            ps.executeUpdate();
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
+    public void moveVehicleToDealer(int vehicleId) throws SQLException {
+        if (!tableHasColumn("rental_vehicles", "dealer_id")) {
+            return;
+        }
+        String sql = "UPDATE rental_vehicles rv " +
+                "JOIN users u ON rv.dealer_id = u.id " +
+                "SET rv.latitude = u.latitude, rv.longitude = u.longitude, rv.city = u.city " +
+                "WHERE rv.id = ? AND u.latitude IS NOT NULL AND u.longitude IS NOT NULL";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, vehicleId);
+            ps.executeUpdate();
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
+    // ===================== RENTAL QUERIES =====================
+
+    public Rental createRental(Rental rental) throws SQLException {
+        String sql = "INSERT INTO rentals (user_id, vehicle_id, start_date, end_date, pickup_city, " +
+                "pickup_address, total_days, total_amount, status, notes) VALUES (?,?,?,?,?,?,?,?,?,?)";
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, rental.getUserId());
+            ps.setInt(2, rental.getVehicleId());
+            ps.setDate(3, Date.valueOf(rental.getStartDate()));
+            ps.setDate(4, Date.valueOf(rental.getEndDate()));
+            ps.setString(5, rental.getPickupCity());
+            ps.setString(6, rental.getPickupAddress());
+            ps.setInt(7, rental.getTotalDays());
+            ps.setBigDecimal(8, rental.getTotalAmount());
+            ps.setString(9, rental.getStatus());
+            ps.setString(10, rental.getNotes());
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) rental.setId(rs.getInt(1));
+            return rental;
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+    }
+
+    public List<Rental> findRentalsByUserId(int userId) throws SQLException {
+        String sql = "SELECT r.*, rv.name as vehicle_name, rv.brand as vehicle_brand " +
+                "FROM rentals r JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
+                "WHERE r.user_id = ? ORDER BY r.created_at DESC";
+        List<Rental> list = new ArrayList<>();
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, userId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Rental r = mapRental(rs);
+                RentalVehicle v = new RentalVehicle();
+                v.setId(r.getVehicleId());
+                v.setName(rs.getString("vehicle_name"));
+                v.setBrand(rs.getString("vehicle_brand"));
+                r.setVehicle(v);
+                list.add(r);
+            }
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+        return list;
+    }
+
+    public Optional<Rental> findRentalById(int id) throws SQLException {
+        String sql = "SELECT r.*, rv.name as vehicle_name, rv.brand as vehicle_brand, " +
+                "rv.price_per_day, rv.category, rv.image_url " +
+                "FROM rentals r JOIN rental_vehicles rv ON r.vehicle_id = rv.id WHERE r.id = ?";
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Rental r = mapRental(rs);
+                RentalVehicle v = new RentalVehicle();
+                v.setId(r.getVehicleId());
+                v.setName(rs.getString("vehicle_name"));
+                v.setBrand(rs.getString("vehicle_brand"));
+                v.setPricePerDay(rs.getBigDecimal("price_per_day"));
+                v.setCategory(rs.getString("category"));
+                v.setImageUrl(rs.getString("image_url"));
+                r.setVehicle(v);
+                return Optional.of(r);
+            }
+            return Optional.empty();
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+    }
+
+    public List<Rental> findAllRentals() throws SQLException {
+        String sql = "SELECT r.*, rv.name as vehicle_name, rv.brand as vehicle_brand, " +
+                "u.username, u.full_name " +
+                "FROM rentals r " +
+                "JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
+                "JOIN users u ON r.user_id = u.id " +
+                "ORDER BY r.created_at DESC";
+        List<Rental> list = new ArrayList<>();
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Rental r = mapRental(rs);
+                RentalVehicle v = new RentalVehicle();
+                v.setId(r.getVehicleId());
+                v.setName(rs.getString("vehicle_name"));
+                v.setBrand(rs.getString("vehicle_brand"));
+                r.setVehicle(v);
+                list.add(r);
+            }
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+        return list;
+    }
+
+    public void updateRentalStatus(int rentalId, String status) throws SQLException {
+        String sql = "UPDATE rentals SET status = ? WHERE id = ?";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, status);
+            ps.setInt(2, rentalId);
+            ps.executeUpdate();
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
+    public int countActiveRentals() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM rentals WHERE status = 'active'";
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+    }
+
+    public List<Rental> findActiveRentals() throws SQLException {
+        String sql = "SELECT r.*, rv.name as vehicle_name, rv.brand as vehicle_brand, " +
+                "rv.latitude, rv.longitude, rv.city, " +
+                "COALESCE(NULLIF(customer.full_name, ''), customer.username) AS customer_name, " +
+                "COALESCE(NULLIF(dealer.full_name, ''), dealer.username) AS dealer_name, " +
+                "dealer.latitude AS dealer_latitude, dealer.longitude AS dealer_longitude " +
+                "FROM rentals r " +
+                "JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
+                "JOIN users customer ON r.user_id = customer.id " +
+                "LEFT JOIN users dealer ON rv.dealer_id = dealer.id AND dealer.role IN ('dealer', 'concessionario') " +
+                "WHERE r.status = 'active' " +
+                "ORDER BY r.start_date DESC";
+        List<Rental> list = new ArrayList<>();
+        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Rental r = mapRental(rs);
+                r.setUserName(rs.getString("customer_name"));
+                RentalVehicle v = new RentalVehicle();
+                v.setId(r.getVehicleId());
+                v.setName(rs.getString("vehicle_name"));
+                v.setBrand(rs.getString("vehicle_brand"));
+                v.setLatitude(rs.getBigDecimal("latitude"));
+                v.setLongitude(rs.getBigDecimal("longitude"));
+                v.setCity(rs.getString("city"));
+                v.setDealerName(rs.getString("dealer_name"));
+                v.setDealerLatitude(rs.getBigDecimal("dealer_latitude"));
+                v.setDealerLongitude(rs.getBigDecimal("dealer_longitude"));
+                r.setVehicle(v);
+                list.add(r);
+            }
+        } finally {
+            DBUtil.close(conn, ps, rs);
+        }
+        return list;
+    }
+
+    private List<String> parseImageUrls(String rawValue, String mainImageUrl) {
+        List<String> imageUrls = new ArrayList<>();
+        addLocalImagePath(imageUrls, mainImageUrl);
+        if (rawValue == null || rawValue.isBlank()) {
+            return imageUrls;
+        }
+        String cleaned = rawValue.replace("[", "")
+                .replace("]", "")
+                .replace("\"", "")
+                .replace("'", "");
+        for (String value : cleaned.split(",")) {
+            addLocalImagePath(imageUrls, value.trim());
+        }
+        return imageUrls;
+    }
+
+    private void addLocalImagePath(List<String> imageUrls, String path) {
+        if (path == null || path.isBlank()) {
+            return;
+        }
+        String normalizedPath = path.trim().replace("\\", "/");
+        if (normalizedPath.startsWith("images/products/")) {
+            normalizedPath = "/" + normalizedPath;
+        }
+        if (normalizedPath.startsWith("/images/products/") && !imageUrls.contains(normalizedPath)) {
+            imageUrls.add(normalizedPath);
+        }
+    }
+
+    private String joinImageUrls(List<String> imageUrls) {
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return "";
+        }
+        List<String> localImages = new ArrayList<>();
+        for (String imageUrl : imageUrls) {
+            addLocalImagePath(localImages, imageUrl);
+        }
+        return String.join(",", localImages);
+    }
+}
+  
