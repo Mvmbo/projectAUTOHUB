@@ -342,6 +342,29 @@ public class ProductDAO {
         }
     }
 
+    public boolean decrementStock(Connection conn, int productId, int qty) throws SQLException {
+        if (conn == null) {
+            throw new SQLException("Connessione non disponibile per aggiornare lo stock.");
+        }
+        if (qty <= 0) {
+            return true;
+        }
+        String sql = "UPDATE products SET stock_quantity = stock_quantity - ?, updated_at = NOW() " +
+                "WHERE id = ? AND is_deleted = FALSE AND stock_quantity >= ?";
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, qty);
+            ps.setInt(2, productId);
+            ps.setInt(3, qty);
+            return ps.executeUpdate() == 1;
+        } finally {
+            if (ps != null) {
+                try { ps.close(); } catch (SQLException ignored) {}
+            }
+        }
+    }
+
     public boolean softDelete(int id) throws SQLException {
         String sql = "UPDATE products SET is_deleted = TRUE, updated_at = NOW() WHERE id = ?";
         Connection conn = null; PreparedStatement ps = null;
