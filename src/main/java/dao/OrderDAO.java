@@ -82,6 +82,20 @@ public class OrderDAO {
             ps2.executeBatch();
             ps2.close();
 
+            ProductDAO productDAO = new ProductDAO();
+            for (CartItem ci : cartItems) {
+                if (ci == null || ci.getProduct() == null) {
+                    continue;
+                }
+                int productId = ci.getProduct().getId();
+                int qty = ci.getQuantity();
+                boolean updated = productDAO.decrementStock(conn, productId, qty);
+                if (!updated) {
+                    String productName = ci.getProduct().getName() != null ? ci.getProduct().getName() : ("#" + productId);
+                    throw new SQLException("Quantità non disponibile in magazzino per: " + productName);
+                }
+            }
+
             conn.commit();
             return order;
         } catch (SQLException e) {
