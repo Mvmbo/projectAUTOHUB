@@ -137,4 +137,82 @@ public class CartServlet extends HttpServlet {
                     break;
                 }
 
-                
+                case "update": {
+                    try {
+                        int productId = Integer.parseInt(req.getParameter("productId"));
+                        int qty = Integer.parseInt(req.getParameter("quantity"));
+
+                        if (qty > 0) {
+                            ProductDAO dao = new ProductDAO();
+                            Optional<Product> opt = dao.findById(productId);
+                            if (opt.isEmpty() || opt.get().isDeleted()) {
+                                resp.getWriter().write("{\"success\":false,\"message\":\"Prodotto non trovato\"}");
+                                return;
+                            }
+                            int stock = opt.get().getStockQuantity();
+                            if (qty > stock) {
+                                resp.getWriter().write("{\"success\":false,\"message\":\"Quantità non disponibile in magazzino (disponibili: "
+                                        + stock + ")\"}");
+                                return;
+                            }
+                        }
+
+                        cart.updateItem(productId, qty);
+                        session.setAttribute("cart", cart);
+
+                        CartItem ci = cart.getCartItem(productId);
+                        BigDecimal itemSub = ci != null ? ci.getSubtotal() : BigDecimal.ZERO;
+
+                        resp.getWriter().write("{\"success\":true,\"cartCount\":" + cart.getTotalItems()
+                                + ",\"itemSubtotal\":\"" + formatPrice(itemSub)
+                                + "\",\"cartTotal\":\"" + formatPrice(cart.getTotalAmount()) + "\"}");
+                    } catch (NumberFormatException e) {
+                        resp.getWriter().write("{\"success\":false,\"message\":\"Dati non validi\"}");
+                    }
+                    break;
+                }
+
+                case "remove": {
+                    try {
+                        int productId = Integer.parseInt(req.getParameter("productId"));
+                        cart.removeItem(productId);
+                        session.setAttribute("cart", cart);
+
+                        resp.getWriter().write("{\"success\":true,\"cartCount\":" + cart.getTotalItems()
+                                + ",\"cartTotal\":\"" + formatPrice(cart.getTotalAmount()) + "\"}");
+                    } catch (NumberFormatException e) {
+                        resp.getWriter().write("{\"success\":false,\"message\":\"ID prodotto non valido\"}");
+                    }
+                    break;
+                }
+
+                case "clear": {
+                    cart.clear();
+                    session.setAttribute("cart", cart);
+                    resp.getWriter().write("{\"success\":true,\"cartCount\":0}");
+                    break;
+                }
+
+                default:
+                    resp.getWriter().write("{\"success\":false,\"message\":\"Azione sconosciuta\"}");
+            }
+        } catch (SQLException e) {
+            getServletContext().log("Errore database carrello", e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"success\":false,\"message\":\"Errore del database: " +
+                    escapeJson(e.getMessage()) + "\"}");
+        } catch (Exception e) {
+            getServletContext().log("Errore server carrello", e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"success\":false,\"message\":\"Errore del server: " +
+                    escapeJson(e.getMessage()) + "\"}");
+        }
+    }
+
+    private String escapeJson(String str) {
+        if (str == null) {
+            return "Errore sconosciuto";
+        }
+        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+    }
+}
