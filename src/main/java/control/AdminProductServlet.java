@@ -165,4 +165,155 @@ public class AdminProductServlet extends HttpServlet {
         return p;
     }
 
-    
+    private List<String> buildImagePathList(HttpServletRequest req, Product existingProduct, String productName) throws IOException, ServletException {
+        List<String> imagePaths = new ArrayList<>();
+        Collection<Part> parts = req.getParts();
+        boolean hasNewImages = false;
+        int uploadedImageCount = 0;
+        for (Part part : parts) {
+            if ("productImages".equals(part.getName()) && part.getSize() > 0) {
+                hasNewImages = true;
+                uploadedImageCount++;
+            }
+        }
+
+        if (uploadedImageCount > MAX_PRODUCT_IMAGES) {
+            throw new ServletException("Puoi caricare al massimo 5 immagini prodotto.");
+        }
+
+        if (!hasNewImages) {
+            addImagePaths(imagePaths, trim(req.getParameter("existingImageUrls")));
+            if (imagePaths.isEmpty() && existingProduct != null) {
+                addImagePaths(imagePaths, existingProduct.getImageUrls());
+                addImagePath(imagePaths, existingProduct.getImageUrl());
+            }
+        }
+
+        for (Part part : parts) {
+            if (!"productImages".equals(part.getName()) || part.getSize() == 0) {
+                continue;
+            }
+            if (imagePaths.size() >= MAX_PRODUCT_IMAGES) {
+                break;
+            }
+            String contentType = part.getContentType();
+            if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
+                continue;
+            }
+            addImagePath(imagePaths, saveProductImage(part));
+        }
+
+        if (imagePaths.size() < MIN_PRODUCT_IMAGES) {
+            throw new ServletException("Carica almeno 3 immagini prodotto salvate in /images/products/.");
+        }
+        return imagePaths;
+    }
+
+    private void addImagePaths(List<String> imagePaths, String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return;
+        }
+        String cleaned = rawValue.replace("[", "")
+                .replace("]", "")
+                .replace("\"", "")
+                .replace("'", "");
+        for (String value : cleaned.split(",")) {
+            addImagePath(imagePaths, value.trim());
+        }
+    }
+
+    private void addImagePath(List<String> imagePaths, String path) {
+        String normalizedPath = normalizeProductImagePath(path);
+        if (normalizedPath != null && !imagePaths.contains(normalizedPath) && imagePaths.size() < MAX_PRODUCT_IMAGES) {
+            imagePaths.add(normalizedPath);
+        }
+    }
+
+    private String saveProductImage(Part part) throws IOException {
+        String submittedName = getSubmittedFileName(part);
+        String extension = extractExtension(submittedName);
+        String fileName = UUID.randomUUID() + extension;
+        byte[] imageBytes;
+        try (InputStream inputStream = part.getInputStream()) {
+            imageBytes = inputStream.readAllBytes();
+        }
+        for (Path uploadDir : resolveProductImageDirectories()) {
+            Files.createDirectories(uploadDir);
+            Files.write(uploadDir.resolve(fileName), imageBytes);
+        }
+        return PRODUCT_IMAGE_DIR + fileName;
+    }
+
+    private List<Path> resolveProductImageDirectories() {
+        List<Path> directories = new ArrayList<>();
+
+        // 1) Webapp deployata (es. target/autohub/images/products) — file serviti da Tomcat
+        String deployedPath = getServletContext().getRealPath(PRODUCT_IMAGE_DIR);
+        if (deployedPath != null && !deployedPath.isBlank()) {
+            Path deployDir = Path.of(deployedPath).toAbsolutePath().normalize();
+            addUploadDirectory(directories, deployDir);
+
+            // 2) Se il deploy è sotto target/, copia anche in src/main/webapp/images/products
+            String normalized = deployDir.toString().replace('\\', '/');
+            int targetIdx = normalized.indexOf("/target/");
+            if (targetIdx >= 0) {
+                Path srcDir = Path.of(normalized.substring(0, targetIdx))
+                        .resolve("src/main/webapp/images/products")
+                        .toAbsolutePath()
+                        .normalize();
+                addUploadDirectory(directories, srcDir);
+            }
+        }
+
+        // 3) Fallback se non c'è /target/ nel path (altro tipo di deploy)
+        addUploadDirectory(
+                directories,
+                Path.of(System.getProperty("user.dir"), "src", "main", "webapp", "images", "products")
+                        .toAbsolutePath()
+                        .normalize()
+        );
+
+        return directories;
+    }
+
+    private void addUploadDirectory(List<Path> directories, Path directory) {
+        if (!directories.contains(directory)) {
+            directories.add(directory);
+        }
+    }
+
+    private String extractExtension(String fileName) {
+        int dotIndex = fileName == null ? -1 : fileName.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == fileName.length() - 1) {
+            return ".jpg";
+        }
+        String extension = fileName.substring(dotIndex).toLowerCase();
+        return extension.matches("\\.(jpg|jpeg|png|webp|gif)") ? extension : ".jpg";
+    }
+
+    private String normalizeProductImagePath(String path) {
+        if (path == null || path.isBlank()) {
+            return null;
+        }
+        String normalizedPath = path.trim().replace("\\", "/");
+        if (normalizedPath.startsWith("images/products/")) {
+            normalizedPath = "/" + normalizedPath;
+        }
+        if (!normalizedPath.startsWith(PRODUCT_IMAGE_DIR)) {
+            return null;
+        }
+        return normalizedPath;
+    }
+
+    private String getSubmittedFileName(Part part) {
+        String submittedName = part.getSubmittedFileName();
+        if (submittedName == null || submittedName.isBlank()) {
+            return "prodotto.jpg";
+        }
+        String normalizedName = submittedName.replace("\\", "/");
+        int slashIndex = normalizedName.lastIndexOf('/');
+        return slashIndex >= 0 ? normalizedName.substring(slashIndex + 1) : normalizedName;
+    }
+
+    private String trim(String s) { return s == null ? "" : s.trim(); }
+}
