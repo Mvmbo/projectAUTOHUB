@@ -63,20 +63,6 @@
       });
     }
 
-    /* ----- Admin: image URL preview ----- */
-    var imgUrlInput = document.getElementById('imageUrl');
-    var imgPreview  = document.getElementById('imagePreview');
-    if (imgUrlInput && imgPreview) {
-      function updatePreview() {
-        var url = imgUrlInput.value.trim();
-        if (url) { imgPreview.src = url; imgPreview.style.display = 'block'; }
-        else { imgPreview.style.display = 'none'; }
-      }
-      imgUrlInput.addEventListener('input', updatePreview);
-      imgUrlInput.addEventListener('change', updatePreview);
-      updatePreview();
-    }
-
     /* ----- Admin orders: active filter badge display ----- */
     var filterForm = document.getElementById('adminOrderFilterForm');
     if (filterForm) {
@@ -90,18 +76,6 @@
           filterForm.submit();
         });
       }
-    }
-
-    /* ----- Payment method toggle (checkout) ----- */
-    var methodInputs = document.querySelectorAll('input[name="paymentMethod"]');
-    var ccFields = document.getElementById('creditCardFields');
-    if (methodInputs.length && ccFields) {
-      function toggleCC() {
-        var sel = document.querySelector('input[name="paymentMethod"]:checked');
-        ccFields.style.display = (sel && sel.value === 'Credit Card') ? 'block' : 'none';
-      }
-      methodInputs.forEach(function(i){ i.addEventListener('change', toggleCC); });
-      toggleCC();
     }
 
     /* ----- Navbar active link ----- */
