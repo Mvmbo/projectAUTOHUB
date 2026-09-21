@@ -132,6 +132,13 @@ public class AdminProductServlet extends HttpServlet {
                     break;
                 }
 
+                case "restore": {
+                    int id = Integer.parseInt(req.getParameter("id"));
+                    dao.softRestore(id);
+                    resp.sendRedirect(req.getContextPath() + "/admin/products?success=restored");
+                    break;
+                }
+
                 default:
                     resp.sendRedirect(req.getContextPath() + "/admin/products");
             }
@@ -317,3 +324,4 @@ public class AdminProductServlet extends HttpServlet {
 
     private String trim(String s) { return s == null ? "" : s.trim(); }
 }
+
