@@ -121,25 +121,6 @@ public class RentalDAO {
         return list;
     }
 
-    public List<RentalVehicle> findVehiclesByCity(String city) throws SQLException {
-        boolean hasDealerId = tableHasColumn("rental_vehicles", "dealer_id");
-        String sql = hasDealerId
-                ? "SELECT rv.*, COALESCE(NULLIF(u.full_name, ''), u.username) AS dealer_name, u.address AS dealer_address, u.city AS dealer_city, u.latitude AS dealer_latitude, u.longitude AS dealer_longitude FROM rental_vehicles rv LEFT JOIN users u ON rv.dealer_id = u.id WHERE rv.is_available = 1 AND rv.city LIKE ?"
-                : "SELECT * FROM rental_vehicles WHERE is_available = 1 AND city LIKE ?";
-        List<RentalVehicle> list = new ArrayList<>();
-        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, "%" + city + "%");
-            rs = ps.executeQuery();
-            while (rs.next()) list.add(mapVehicle(rs));
-        } finally {
-            DBUtil.close(conn, ps, rs);
-        }
-        return list;
-    }
-
     public Optional<RentalVehicle> findVehicleById(int id) throws SQLException {
         boolean hasDealerId = tableHasColumn("rental_vehicles", "dealer_id");
         String sql = hasDealerId
@@ -455,20 +436,6 @@ public class RentalDAO {
         return list;
     }
 
-    public void updateRentalStatus(int rentalId, String status) throws SQLException {
-        String sql = "UPDATE rentals SET status = ? WHERE id = ?";
-        Connection conn = null; PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, status);
-            ps.setInt(2, rentalId);
-            ps.executeUpdate();
-        } finally {
-            DBUtil.close(conn, ps);
-        }
-    }
-
     public void completeActiveRentalsForVehicle(int vehicleId) throws SQLException {
         String sql = "UPDATE rentals SET status = 'completed' WHERE vehicle_id = ? AND status = 'active'";
         Connection conn = null; PreparedStatement ps = null;
@@ -590,3 +557,4 @@ public class RentalDAO {
         return String.join(",", localImages);
     }
 }
+
