@@ -119,11 +119,6 @@
                   </p>
                 </div>
               </div>
-              <!-- Notes -->
-              <div class="col-12">
-                <label class="form-label" style="color:#aaa; font-size:0.75rem; letter-spacing:1px;">Note Aggiuntive</label>
-                <textarea name="notes" class="form-control" rows="3" placeholder="Eventuali richieste o note...">${not empty formData.notes ? formData.notes : ''}</textarea>
-              </div>
             </div>
 
             <!-- Price Summary -->
