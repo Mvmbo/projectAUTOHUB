@@ -11,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +22,6 @@ public class AdminDashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (!isAdminSession(req)) {
-            safeRedirect(resp, req.getContextPath() + "/admin/login");
-            return;
-        }
-
         int productCount = 0;
         int todayOrders = 0;
         int userCount = 0;
@@ -77,24 +71,6 @@ public class AdminDashboardServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/view/admin/dashboard.jsp").forward(req, resp);
         } catch (Exception e) {
             throw new ServletException("Errore rendering dashboard admin: " + safeMessage(e), e);
-        }
-    }
-
-    private boolean isAdminSession(HttpServletRequest req) {
-        HttpSession session = req == null ? null : req.getSession(false);
-        if (session == null) {
-            return false;
-        }
-        if (Boolean.TRUE.equals(session.getAttribute("sessionAdmin"))) {
-            return true;
-        }
-        Object sessionUser = session.getAttribute("sessionUser");
-        return sessionUser instanceof User && ((User) sessionUser).isAdmin();
-    }
-
-    private void safeRedirect(HttpServletResponse resp, String location) throws IOException {
-        if (!resp.isCommitted()) {
-            resp.sendRedirect(location);
         }
     }
 
