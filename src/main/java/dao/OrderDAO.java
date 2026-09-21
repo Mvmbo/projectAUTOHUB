@@ -153,21 +153,6 @@ public class OrderDAO {
         return order;
     }
 
-    public List<Order> findAll() throws SQLException {
-        String sql = "SELECT * FROM orders ORDER BY created_at DESC";
-        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
-        List<Order> list = new ArrayList<>();
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-            while (rs.next()) list.add(mapOrderRow(rs));
-        } finally {
-            DBUtil.close(conn, ps, rs);
-        }
-        return list;
-    }
-
     public List<Order> findWithFilters(LocalDate fromDate, LocalDate toDate, Integer userId) throws SQLException {
         StringBuilder sb = new StringBuilder("SELECT * FROM orders WHERE 1=1");
         List<Object> params = new ArrayList<>();
@@ -232,10 +217,5 @@ public class OrderDAO {
             DBUtil.close(conn, ps, rs);
         }
         return list;
-    }
-
-    public Optional<Order> findById(int orderId) throws SQLException {
-        Order o = findOrderWithItems(orderId);
-        return Optional.ofNullable(o);
     }
 }
