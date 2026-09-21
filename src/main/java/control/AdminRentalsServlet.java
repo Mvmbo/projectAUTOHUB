@@ -162,6 +162,7 @@ public class AdminRentalsServlet extends HttpServlet {
                 RentalDAO dao = new RentalDAO();
                 dao.updateVehicleAvailability(id, true);
                 dao.moveVehicleToDealer(id);
+                dao.completeActiveRentalsForVehicle(id);
                 resp.sendRedirect(req.getContextPath() + "/admin/rentals?success=released");
             } catch (Exception e) {
                 req.setAttribute("error", "Rilascio veicolo non riuscito: " + e.getMessage());
