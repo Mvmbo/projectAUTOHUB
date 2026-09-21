@@ -469,8 +469,34 @@ public class RentalDAO {
         }
     }
 
+    public void completeActiveRentalsForVehicle(int vehicleId) throws SQLException {
+        String sql = "UPDATE rentals SET status = 'completed' WHERE vehicle_id = ? AND status = 'active'";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, vehicleId);
+            ps.executeUpdate();
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
+    public void syncCompletedRentals() {
+        String sql = "UPDATE rentals r " +
+                "JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
+                "SET r.status = 'completed' " +
+                "WHERE r.status = 'active' AND (rv.is_available = 1 OR rv.is_available IS TRUE)";
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (Exception ignored) {}
+    }
+
     public int countActiveRentals() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM rentals WHERE status = 'active'";
+        syncCompletedRentals();
+        String sql = "SELECT COUNT(*) FROM rentals r " +
+                "JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
+                "WHERE r.status = 'active' AND (rv.is_available = 0 OR rv.is_available IS FALSE)";
         Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
         try {
             conn = DBUtil.getConnection();
@@ -484,6 +510,7 @@ public class RentalDAO {
     }
 
     public List<Rental> findActiveRentals() throws SQLException {
+        syncCompletedRentals();
         String sql = "SELECT r.*, rv.name as vehicle_name, rv.brand as vehicle_brand, " +
                 "rv.latitude, rv.longitude, rv.city, " +
                 "COALESCE(NULLIF(customer.full_name, ''), customer.username) AS customer_name, " +
@@ -493,7 +520,7 @@ public class RentalDAO {
                 "JOIN rental_vehicles rv ON r.vehicle_id = rv.id " +
                 "JOIN users customer ON r.user_id = customer.id " +
                 "LEFT JOIN users dealer ON rv.dealer_id = dealer.id AND dealer.role IN ('dealer', 'concessionario') " +
-                "WHERE r.status = 'active' " +
+                "WHERE r.status = 'active' AND (rv.is_available = 0 OR rv.is_available IS FALSE) " +
                 "ORDER BY r.start_date DESC";
         List<Rental> list = new ArrayList<>();
         Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
@@ -563,4 +590,3 @@ public class RentalDAO {
         return String.join(",", localImages);
     }
 }
-  
