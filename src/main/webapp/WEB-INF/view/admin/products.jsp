@@ -35,6 +35,7 @@
           <c:when test="${param.success eq 'created'}">creato con successo.</c:when>
           <c:when test="${param.success eq 'updated'}">aggiornato con successo.</c:when>
           <c:when test="${param.success eq 'deleted'}">eliminato (soft delete).</c:when>
+          <c:when test="${param.success eq 'restored'}">ripristinato con successo.</c:when>
         </c:choose>
       </div>
     </c:if>
@@ -109,15 +110,28 @@
                         <a href="${pageContext.request.contextPath}/admin/products?action=view&id=${p.id}" class="btn-admin-outline btn-admin-sm">
                           <i class="bi bi-eye"></i>
                         </a>
-                        <c:if test="${!p.deleted}">
-                          <a href="${pageContext.request.contextPath}/admin/products?action=edit&id=${p.id}" class="btn-admin btn-admin-sm">
-                            <i class="bi bi-pencil"></i>
-                          </a>
-                          <button type="button" class="btn-admin-danger btn-admin-sm"
-                                  onclick="confirmDelete(${p.id}, '${p.name}')">
-                            <i class="bi bi-trash"></i>
-                          </button>
-                        </c:if>
+                        <c:choose>
+                          <c:when test="${!p.deleted}">
+                            <a href="${pageContext.request.contextPath}/admin/products?action=edit&id=${p.id}" class="btn-admin btn-admin-sm">
+                              <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn-admin-danger btn-admin-sm"
+                                    onclick="confirmDelete(${p.id}, '${p.name}')">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </c:when>
+                          <c:otherwise>
+                            <form method="post" action="${pageContext.request.contextPath}/admin/products" style="display:inline;">
+                              <input type="hidden" name="action" value="restore">
+                              <input type="hidden" name="id" value="${p.id}">
+                              <button type="submit" class="btn-admin btn-admin-sm" title="Ripristina prodotto"
+                                      style="background:rgba(92,184,92,0.15); border-color:rgba(92,184,92,0.4); color:#5cb85c;"
+                                      onclick="return confirm('Ripristinare il prodotto ${p.name}?')">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                              </button>
+                            </form>
+                          </c:otherwise>
+                        </c:choose>
                       </div>
                     </td>
                   </tr>
