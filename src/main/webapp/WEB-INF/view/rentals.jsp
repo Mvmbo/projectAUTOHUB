@@ -38,6 +38,7 @@
         <p style="color:#aaa; margin:0; font-size:0.9rem;">
           Scegli la supercar dei tuoi sogni e seleziona le date del noleggio.
           Il ritiro avviene presso il concessionario che possiede l'auto.
+          Le auto a noleggio saranno monitorate tramite geolocalizzazione per tutta la durata del noleggio.
         </p>
       </div>
       <div class="col-md-4 text-md-end mt-3 mt-md-0">
