@@ -77,8 +77,4 @@ public class User implements Serializable {
         String normalizedRole = role.trim().toLowerCase();
         return "dealer".equals(normalizedRole) || "concessionario".equals(normalizedRole);
     }
-
-    public boolean canManageVehicles() {
-        return isAdmin() || isDealer();
-    }
 }
