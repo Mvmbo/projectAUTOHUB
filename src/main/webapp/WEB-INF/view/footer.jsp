@@ -28,10 +28,12 @@
       <div class="col-lg-2 col-md-6">
         <h5 style="font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:#888; font-family:'Montserrat',sans-serif; margin-bottom:1rem;">Categorie</h5>
         <ul class="list-unstyled">
-          <li><a href="${pageContext.request.contextPath}/catalog?category=Supercars">Supercar</a></li>
-          <li><a href="${pageContext.request.contextPath}/catalog?category=Performance+Parts">Ricambi Performance</a></li>
+          <li><a href="${pageContext.request.contextPath}/catalog?category=Supercars">Supercars</a></li>
+          <li><a href="${pageContext.request.contextPath}/catalog?category=Coupe+Sportive">Coupé Sportive</a></li>
+          <li><a href="${pageContext.request.contextPath}/catalog?category=Gran+Turismo">Gran Turismo</a></li>
+          <li><a href="${pageContext.request.contextPath}/catalog?category=Suv+Premium">Suv Premium</a></li>
+          <li><a href="${pageContext.request.contextPath}/catalog?category=Ricambi+Performance">Ricambi Performance</a></li>
           <li><a href="${pageContext.request.contextPath}/catalog?category=Accessories">Accessori</a></li>
-          <li><a href="${pageContext.request.contextPath}/catalog?category=Merchandise">Merchandising</a></li>
         </ul>
       </div>
 
@@ -49,8 +51,7 @@
     <hr class="footer-divider">
 
     <p class="footer-copyright">
-      &copy; 2026 AutoHUB &nbsp;&bull;&nbsp; Tutti i diritti riservati &nbsp;&bull;&nbsp;
-      <a href="#" style="color:#444;">Privacy</a> &nbsp;&bull;&nbsp; <a href="#" style="color:#444;">Termini</a>
+      &copy; 2026 AutoHUB
     </p>
   </div>
 </footer>
