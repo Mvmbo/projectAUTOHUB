@@ -42,7 +42,16 @@
           </c:if>
           <div class="${mode eq 'rental' ? 'col-md-6' : 'col-12'}"><label class="form-label">Nome veicolo *</label><input class="form-control" name="name" value="${vehicleName}" required></div>
           <div class="col-12"><label class="form-label">Descrizione</label><textarea class="form-control" rows="4" name="description">${vehicleDescription}</textarea></div>
-          <div class="col-md-6"><label class="form-label">Categoria</label><input class="form-control" name="category" value="${vehicleCategory}"></div>
+          <div class="col-md-6">
+            <label class="form-label">Categoria</label>
+            <select class="form-select" name="category">
+              <option value="">Seleziona una categoria...</option>
+              <c:set var="dealerCats" value="Supercars,Coupe Sportive,Gran Turismo,Suv Premium,Ricambi Performance,Accessories,Other"/>
+              <c:forTokens var="dcat" items="${dealerCats}" delims=",">
+                <option value="${dcat}" ${vehicleCategory eq dcat ? 'selected' : ''}>${dcat}</option>
+              </c:forTokens>
+            </select>
+          </div>
           <div class="col-md-6">
             <label class="form-label" for="vehicleImages">Immagini veicolo *</label>
             <input class="form-control" id="vehicleImages" name="vehicleImages" type="file" accept="image/*" multiple ${isEdit ? '' : 'required'}>
@@ -85,8 +94,13 @@
               <div class="col-md-4"><label class="form-label">Motore</label><input class="form-control" name="engine" value="${not empty saleVehicle ? saleVehicle.engine : ''}"></div>
               <div class="col-md-4"><label class="form-label">Potenza</label><input class="form-control" name="power" value="${not empty saleVehicle ? saleVehicle.power : ''}"></div>
               <div class="col-md-4"><label class="form-label">Chilometraggio</label><input class="form-control" name="mileage" value="${not empty saleVehicle ? saleVehicle.mileage : ''}"></div>
-              <div class="col-md-6"><label class="form-label">Cambio</label><input class="form-control" name="transmission" value="${not empty saleVehicle ? saleVehicle.transmission : ''}"></div>
-              <div class="col-md-6"><label class="form-label">Trazione</label><input class="form-control" name="drivetrain" value="${not empty saleVehicle ? saleVehicle.drivetrain : ''}"></div>
+              <div class="col-md-4"><label class="form-label">Cambio</label><input class="form-control" name="transmission" value="${not empty saleVehicle ? saleVehicle.transmission : ''}"></div>
+              <div class="col-md-4"><label class="form-label">Trazione</label><input class="form-control" name="drivetrain" value="${not empty saleVehicle ? saleVehicle.drivetrain : ''}"></div>
+              <div class="col-md-4"><label class="form-label">0-100 km/h</label><input class="form-control" name="acceleration" value="${not empty saleVehicle ? saleVehicle.acceleration : ''}" placeholder="es. 3,5 s"></div>
+              <div class="col-md-4"><label class="form-label">Velocità max</label><input class="form-control" name="topSpeed" value="${not empty saleVehicle ? saleVehicle.topSpeed : ''}" placeholder="es. 310 km/h"></div>
+              <div class="col-md-4"><label class="form-label">Consumi</label><input class="form-control" name="fuelConsumption" value="${not empty saleVehicle ? saleVehicle.fuelConsumption : ''}" placeholder="es. 11,8 l/100 km"></div>
+              <div class="col-md-4"><label class="form-label">Dimensioni</label><input class="form-control" name="dimensions" value="${not empty saleVehicle ? saleVehicle.dimensions : ''}" placeholder="es. 4,50 m x 1,90 m x 1,20 m"></div>
+              <div class="col-12"><label class="form-label">Dotazioni / Equipaggiamento (separate da <code>;</code>)</label><textarea class="form-control" rows="3" name="equipment" placeholder="Pelle Nappa;Fari Matrix LED;Assetto Sportivo">${not empty saleVehicle ? saleVehicle.equipment : ''}</textarea></div>
             </c:otherwise>
           </c:choose>
         </div>
