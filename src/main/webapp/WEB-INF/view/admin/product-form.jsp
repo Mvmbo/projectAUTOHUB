@@ -58,7 +58,7 @@
               <label class="form-label" for="category">Categoria *</label>
               <select id="category" name="category" class="form-select">
                 <option value="">Seleziona una categoria...</option>
-                <c:set var="cats" value="Supercars,Performance Parts,Merchandise,Accessories,Other"/>
+                <c:set var="cats" value="Supercars,Coupe Sportive,Gran Turismo,Suv Premium,Ricambi Performance,Accessories,Other"/>
                 <c:forTokens var="cat" items="${cats}" delims=",">
                   <option value="${cat}" ${not empty product and product.category eq cat ? 'selected' : ''}>${cat}</option>
                 </c:forTokens>
@@ -109,6 +109,79 @@
                 <span id="previewPlaceholder" style="${not empty currentImage ? 'display:none' : 'display:block; color:#444; font-size:0.75rem; letter-spacing:2px;'}">
                   ANTEPRIMA IMMAGINI
                 </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-form-section">
+            <p class="admin-form-section-title"><i class="bi bi-speedometer2 me-2"></i>Specifiche Tecniche <span style="font-weight:400; font-size:0.75rem; color:#666;">(opzionali)</span></p>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="productionYear">Anno di produzione</label>
+                <input type="number" id="productionYear" name="productionYear" class="form-control"
+                       min="1900" max="2099"
+                       value="${not empty product and not empty product.productionYear ? product.productionYear : ''}"
+                       placeholder="es. 2023">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="power">Potenza</label>
+                <input type="text" id="power" name="power" class="form-control"
+                       value="${not empty product ? product.power : ''}"
+                       placeholder="es. 650 CV">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="acceleration">0–100 km/h</label>
+                <input type="text" id="acceleration" name="acceleration" class="form-control"
+                       value="${not empty product ? product.acceleration : ''}"
+                       placeholder="es. 3,2 s">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="topSpeed">Velocità max</label>
+                <input type="text" id="topSpeed" name="topSpeed" class="form-control"
+                       value="${not empty product ? product.topSpeed : ''}"
+                       placeholder="es. 320 km/h">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="engine">Motore</label>
+                <input type="text" id="engine" name="engine" class="form-control"
+                       value="${not empty product ? product.engine : ''}"
+                       placeholder="es. V8 biturbo 4.0 L">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="transmission">Cambio</label>
+                <input type="text" id="transmission" name="transmission" class="form-control"
+                       value="${not empty product ? product.transmission : ''}"
+                       placeholder="es. Automatico doppia frizione">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="drivetrain">Trazione</label>
+                <input type="text" id="drivetrain" name="drivetrain" class="form-control"
+                       value="${not empty product ? product.drivetrain : ''}"
+                       placeholder="es. AWD / Posteriore">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="fuelConsumption">Consumi</label>
+                <input type="text" id="fuelConsumption" name="fuelConsumption" class="form-control"
+                       value="${not empty product ? product.fuelConsumption : ''}"
+                       placeholder="es. 12,5 l/100 km">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="mileage">Chilometraggio</label>
+                <input type="text" id="mileage" name="mileage" class="form-control"
+                       value="${not empty product ? product.mileage : ''}"
+                       placeholder="es. 15.000 km">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="dimensions">Dimensioni</label>
+                <input type="text" id="dimensions" name="dimensions" class="form-control"
+                       value="${not empty product ? product.dimensions : ''}"
+                       placeholder="es. 4,56 m x 1,95 m x 1,18 m">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="equipment">Dotazioni / Equipaggiamento</label>
+                <textarea id="equipment" name="equipment" class="form-control" rows="3"
+                          placeholder="Inserisci le dotazioni separate da punto e virgola, es: Pelle Nappa;Cerchi da 21&quot;;Impianto audio premium">${not empty product ? product.equipment : ''}</textarea>
+                <small style="color:#666; font-size:0.75rem;">Separare ogni voce con <code>;</code> — verrà mostrata come lista nella scheda prodotto.</small>
               </div>
             </div>
           </div>
