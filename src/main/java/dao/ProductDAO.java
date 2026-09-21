@@ -148,25 +148,6 @@ public class ProductDAO {
         }
     }
 
-    public List<Product> findByCategory(String category) throws SQLException {
-        boolean hasDealerId = tableHasColumn("products", "dealer_id");
-        String sql = hasDealerId
-                ? "SELECT p.*, COALESCE(NULLIF(u.full_name, ''), u.username) AS dealer_name FROM products p LEFT JOIN users u ON p.dealer_id = u.id WHERE p.category = ? AND p.is_deleted = FALSE ORDER BY p.created_at DESC"
-                : "SELECT * FROM products WHERE category = ? AND is_deleted = FALSE ORDER BY created_at DESC";
-        Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
-        List<Product> list = new ArrayList<>();
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, category);
-            rs = ps.executeQuery();
-            while (rs.next()) list.add(mapRow(rs));
-        } finally {
-            DBUtil.close(conn, ps, rs);
-        }
-        return list;
-    }
-
     public List<Product> search(String keyword) throws SQLException {
         boolean hasDealerId = tableHasColumn("products", "dealer_id");
         String sql = hasDealerId
@@ -189,14 +170,20 @@ public class ProductDAO {
     }
 
     public List<String> findAllCategories() throws SQLException {
-        String sql = "SELECT DISTINCT category FROM products WHERE is_deleted = FALSE AND category IS NOT NULL ORDER BY category";
+        String sql = "SELECT DISTINCT category FROM products WHERE is_deleted = FALSE AND category IS NOT NULL " +
+                "AND LOWER(category) NOT IN ('merchandise', 'merchandising') ORDER BY category";
         Connection conn = null; PreparedStatement ps = null; ResultSet rs = null;
         List<String> cats = new ArrayList<>();
         try {
             conn = DBUtil.getConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            while (rs.next()) cats.add(rs.getString("category"));
+            while (rs.next()) {
+                String cat = rs.getString("category");
+                if (!cats.contains(cat)) {
+                    cats.add(cat);
+                }
+            }
         } finally {
             DBUtil.close(conn, ps, rs);
         }
@@ -378,6 +365,19 @@ public class ProductDAO {
         }
     }
 
+    public boolean softRestore(int id) throws SQLException {
+        String sql = "UPDATE products SET is_deleted = FALSE, updated_at = NOW() WHERE id = ?";
+        Connection conn = null; PreparedStatement ps = null;
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } finally {
+            DBUtil.close(conn, ps);
+        }
+    }
+
     public List<Product> findNewest(int limit) throws SQLException {
         boolean hasDealerId = tableHasColumn("products", "dealer_id");
         String sql = hasDealerId
@@ -447,3 +447,4 @@ public class ProductDAO {
         }
     }
 }
+
