@@ -121,11 +121,4 @@ public class Cart implements Serializable {
     public boolean isEmpty() {
         return items.isEmpty();
     }
-
-    /**
-     * Gets the count of distinct products (not total quantity).
-     */
-    public int getItemCount() {
-        return items.size();
-    }
 }
