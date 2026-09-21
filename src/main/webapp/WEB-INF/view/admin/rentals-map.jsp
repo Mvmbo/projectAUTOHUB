@@ -45,6 +45,9 @@
     <c:if test="${param.success eq 'deleted'}">
       <div class="admin-alert admin-alert-success mb-3">Veicolo a noleggio eliminato con successo.</div>
     </c:if>
+    <c:if test="${param.success eq 'released'}">
+      <div class="admin-alert admin-alert-success mb-3">Noleggio disattivato: veicolo ora disponibile e riposizionato in concessionaria.</div>
+    </c:if>
 
     <!-- Map Section -->
     <div style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.15); border-radius:4px; overflow:hidden; margin-bottom:1.5rem;">
@@ -105,13 +108,30 @@
                         onclick="focusVehicle(${v.id}, ${not empty v.latitude ? v.latitude : 'null'}, ${not empty v.longitude ? v.longitude : 'null'})">
                   <i class="bi bi-crosshair"></i>
                 </button>
-                <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="display:inline; margin-left:0.4rem;">
-                  <input type="hidden" name="action" value="deleteVehicle">
-                  <input type="hidden" name="id" value="${v.id}">
-                  <button type="submit" class="btn-admin-danger btn-admin-sm" onclick="return confirm('Eliminare questo veicolo a noleggio?');">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </form>
+                <c:choose>
+                  <c:when test="${v.available}">
+                    <%-- Veicolo disponibile: mostra il cestino (soft-delete) --%>
+                    <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="display:inline; margin-left:0.4rem;">
+                      <input type="hidden" name="action" value="deleteVehicle">
+                      <input type="hidden" name="id" value="${v.id}">
+                      <button type="submit" class="btn-admin-danger btn-admin-sm" onclick="return confirm('Eliminare questo veicolo a noleggio?');">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </c:when>
+                  <c:otherwise>
+                    <%-- Veicolo noleggiato: mostra il pulsante Disattiva noleggio --%>
+                    <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="display:inline; margin-left:0.4rem;">
+                      <input type="hidden" name="action" value="releaseVehicle">
+                      <input type="hidden" name="id" value="${v.id}">
+                      <button type="submit" class="btn-admin btn-admin-sm" title="Disattiva noleggio e riposiziona in concessionaria"
+                              style="background:rgba(212,175,55,0.15); border-color:rgba(212,175,55,0.4); color:#D4AF37;"
+                              onclick="return confirm('Disattivare il noleggio per ${v.name} e riportare il veicolo in concessionaria?');">
+                        <i class="bi bi-house-door"></i>
+                      </button>
+                    </form>
+                  </c:otherwise>
+                </c:choose>
               </td>
             </tr>
           </c:forEach>
@@ -144,9 +164,17 @@
                     <p style="margin-bottom:0.25rem;"><i class="bi bi-shop me-1"></i>${r.vehicle.dealerName}</p>
                     <p style="margin-bottom:0.25rem;"><i class="bi bi-calendar me-1"></i>${r.startDate} - ${r.endDate}</p>
                     <p style="margin-bottom:0.25rem;"><i class="bi bi-geo-alt me-1"></i>${r.pickupCity}</p>
-                    <p style="margin-bottom:0;"><i class="bi bi-currency-euro me-1"></i>
+                    <p style="margin-bottom:0.75rem;"><i class="bi bi-currency-euro me-1"></i>
                       <fmt:formatNumber value="${r.totalAmount}" type="currency" currencySymbol="€" maxFractionDigits="2"/>
                     </p>
+                    <form method="post" action="${pageContext.request.contextPath}/admin/rentals" style="margin:0;">
+                      <input type="hidden" name="action" value="releaseVehicle">
+                      <input type="hidden" name="id" value="${r.vehicleId}">
+                      <button type="submit" class="btn-admin btn-admin-sm w-100" style="font-size:0.75rem; padding:6px 12px; background:rgba(212,175,55,0.15); border-color:rgba(212,175,55,0.4); color:#D4AF37;"
+                              onclick="return confirm('Disattivare il noleggio per ${r.vehicle.name} e riportare il veicolo in concessionaria?');">
+                        <i class="bi bi-house-door me-1"></i>Disattiva noleggio
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>
