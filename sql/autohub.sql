@@ -222,21 +222,22 @@ INSERT IGNORE INTO products (name, description, price, stock_quantity, category,
 UPDATE products SET
     name = 'Ferrari 488 GTB - Pacchetto Sport',
     description = 'Supercar italiana con V8 centrale-posteriore, kit estetico in fibra di carbonio e scarico sportivo.',
-    category = 'Supercar'
+    category = 'Supercars'
 WHERE name LIKE 'Ferrari 488 GTB%';
 
 UPDATE products SET
     name = 'Lamborghini Huracan EVO - Configurazione Carbonio',
     description = 'V10 aspirato da 5.2 litri, allestimento personalizzato e pacchetto aerodinamico sportivo.',
-    category = 'Supercar'
+    category = 'Supercars'
 WHERE name LIKE 'Lamborghini Huracan%';
 
 UPDATE products SET
     name = 'Porsche 911 GT3 RS - Edizione Pista',
     description = 'Boxer aspirato da 520 CV, pacchetto Weissach e preparazione telaio orientata alla pista.',
-    category = 'Supercar'
+    category = 'Supercars'
 WHERE name LIKE 'Porsche 911 GT3 RS%';
 
+UPDATE products SET category = 'Supercars' WHERE category = 'Supercar';
 UPDATE products SET category = 'Ricambi Performance' WHERE category = 'Performance Parts';
 UPDATE products SET category = 'Accessori' WHERE category = 'Accessories';
 UPDATE products SET category = 'Merchandising' WHERE category = 'Merchandise';
@@ -255,15 +256,15 @@ INSERT IGNORE INTO products
 
 ('Maserati MC20 - Nettuno Launch Edition',
  'Supercar italiana con telaio in carbonio e motore V6 Nettuno. Combina leggerezza, tecnologia e design essenziale firmato Maserati.',
- 245000.00, 1, 'Supercar',
+ 245000.00, 1, 'Supercars',
  'https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg',
  '["https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg","https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg","https://images.pexels.com/photos/3972755/pexels-photo-3972755.jpeg"]',
- 2022, 'V6 biturbo Nettuno 3.0 L', '630 CV', 'Automatico doppia frizione 8 rapporti', 'Posteriore', '2,9 s', '325 km/h', '11,6 l/100 km combinato', '4669 x 1965 x 1224 mm', '8.900 km',
+ 2021, 'V6 biturbo Nettuno 3.0 L', '630 CV', 'Automatico doppia frizione 8 rapporti', 'Posteriore', '2,9 s', '325 km/h', '11,6 l/100 km combinato', '4669 x 1965 x 1224 mm', '8.900 km',
  'Telaio monoscocca in carbonio;Launch control;Assetto elettronico;Interni sportivi premium;Garanzia ufficiale residua'),
 
 ('Audi R8 V10 Performance - Quattro',
  'Coupe a motore centrale con V10 aspirato, trazione quattro e finiture Audi Exclusive. Prestazioni da supercar con grande fruibilita quotidiana.',
- 168000.00, 2, 'Supercar',
+ 168000.00, 2, 'Supercars',
  'https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg',
  '["https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg","https://images.pexels.com/photos/337909/pexels-photo-337909.jpeg","https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg"]',
  2021, 'V10 aspirato 5.2 L', '620 CV', 'S tronic 7 rapporti', 'Integrale quattro', '3,1 s', '331 km/h', '13,1 l/100 km combinato', '4429 x 1940 x 1236 mm', '16.200 km',
