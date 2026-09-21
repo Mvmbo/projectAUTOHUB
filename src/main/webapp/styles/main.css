@@ -1385,12 +1385,6 @@ footer a:hover { color: var(--gold); }
 
 /* ---------- Utilities ---------- */
 .text-gold { color: var(--gold) !important; }
-.text-muted-custom { color: var(--text-muted) !important; }
-.bg-charcoal { background: var(--charcoal) !important; }
-.border-gold { border-color: var(--border) !important; }
-.font-playfair { font-family: 'Playfair Display', serif; }
-.letter-spacing-2 { letter-spacing: 2px; }
-.letter-spacing-3 { letter-spacing: 3px; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 991px) {
