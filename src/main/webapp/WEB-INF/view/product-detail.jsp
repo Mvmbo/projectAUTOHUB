@@ -207,12 +207,21 @@
         </div>
         <div class="col-lg-7">
           <div class="detail-equipment-grid">
-            <c:forEach var="item" items="${equipmentItems}">
-              <div class="detail-equipment-item">
-                <i class="bi bi-check2"></i>
-                <span>${item}</span>
-              </div>
-            </c:forEach>
+            <c:choose>
+              <c:when test="${not empty equipmentItems}">
+                <c:forEach var="item" items="${equipmentItems}">
+                  <div class="detail-equipment-item">
+                    <i class="bi bi-check2"></i>
+                    <span>${item}</span>
+                  </div>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <div class="detail-equipment-item" style="grid-column: 1 / -1; color: #888;">
+                  <span>Nessuna dotazione indicata</span>
+                </div>
+              </c:otherwise>
+            </c:choose>
           </div>
         </div>
       </div>
