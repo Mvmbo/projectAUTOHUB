@@ -72,30 +72,29 @@ public class ProductDetailServlet extends HttpServlet {
 
     private List<Map<String, String>> buildPerformanceHighlights(Product product) {
         List<Map<String, String>> highlights = new ArrayList<>();
-        addSpec(highlights, "bi-speedometer2", "Potenza", valueOrDefault(product.getPower(), inferPower(product)));
-        addSpec(highlights, "bi-stopwatch", "0-100 km/h", valueOrDefault(product.getAcceleration(), inferAcceleration(product)));
-        addSpec(highlights, "bi-lightning-charge", "Velocita'", valueOrDefault(product.getTopSpeed(), inferTopSpeed(product)));
-        addSpec(highlights, "bi-calendar3", "Anno", product.getProductionYear() != null ? product.getProductionYear().toString() : inferYear(product));
+        addSpec(highlights, "bi-speedometer2", "Potenza", nd(product.getPower()));
+        addSpec(highlights, "bi-stopwatch", "0-100 km/h", nd(product.getAcceleration()));
+        addSpec(highlights, "bi-lightning-charge", "Velocita'", nd(product.getTopSpeed()));
+        addSpec(highlights, "bi-calendar3", "Anno", product.getProductionYear() != null ? product.getProductionYear().toString() : "N/D");
         return highlights;
     }
 
     private List<Map<String, String>> buildTechnicalSpecs(Product product) {
         List<Map<String, String>> specs = new ArrayList<>();
-        addSpec(specs, "bi-cpu", "Motore", valueOrDefault(product.getEngine(), inferEngine(product)));
-        addSpec(specs, "bi-gear", "Cambio", valueOrDefault(product.getTransmission(), inferTransmission(product)));
-        addSpec(specs, "bi-diagram-3", "Trazione", valueOrDefault(product.getDrivetrain(), inferDrivetrain(product)));
-        addSpec(specs, "bi-fuel-pump", "Consumi", valueOrDefault(product.getFuelConsumption(), inferConsumption(product)));
-        addSpec(specs, "bi-signpost-2", "Chilometraggio", valueOrDefault(product.getMileage(), inferMileage(product)));
+        addSpec(specs, "bi-cpu", "Motore", nd(product.getEngine()));
+        addSpec(specs, "bi-gear", "Cambio", nd(product.getTransmission()));
+        addSpec(specs, "bi-diagram-3", "Trazione", nd(product.getDrivetrain()));
+        addSpec(specs, "bi-fuel-pump", "Consumi", nd(product.getFuelConsumption()));
+        addSpec(specs, "bi-signpost-2", "Chilometraggio", nd(product.getMileage()));
         addSpec(specs, "bi-upc-scan", "Codice veicolo", "AH-" + product.getId());
         return specs;
     }
 
     private List<Map<String, String>> buildDimensionSpecs(Product product) {
         List<Map<String, String>> specs = new ArrayList<>();
-        addSpec(specs, "bi-arrows-angle-expand", "Dimensioni", valueOrDefault(product.getDimensions(), inferDimensions(product)));
+        addSpec(specs, "bi-arrows-angle-expand", "Dimensioni", nd(product.getDimensions()));
         addSpec(specs, "bi-box-seam", "Disponibilita'", product.getStockQuantity() > 0 ? product.getStockQuantity() + " unita' disponibili" : "Non disponibile");
-        addSpec(specs, "bi-tags", "Categoria", valueOrDefault(product.getCategory(), "Automotive premium"));
-        addSpec(specs, "bi-shield-check", "Garanzia", inferWarranty(product));
+        addSpec(specs, "bi-tags", "Categoria", nd(product.getCategory()));
         return specs;
     }
 
@@ -108,24 +107,11 @@ public class ProductDetailServlet extends HttpServlet {
                 }
             }
         }
-
-        if (!items.isEmpty()) {
-            return items;
-        }
-
-        if (isVehicle(product)) {
-            items.add("Interni in pelle premium con cuciture a contrasto");
-            items.add("Sistema infotainment con navigazione e connettivita' smartphone");
-            items.add("Fari LED adattivi e pacchetto assistenza alla guida");
-            items.add("Impianto frenante sportivo e assetto performance");
-            items.add("Controllo qualita' AutoHUB con verifica documentale");
-        } else {
-            items.add("Materiali selezionati per uso stradale e sportivo");
-            items.add("Compatibilita' verificata dal team tecnico AutoHUB");
-            items.add("Finitura premium coerente con vetture di fascia alta");
-            items.add("Assistenza pre e post vendita inclusa");
-        }
         return items;
+    }
+
+    private String nd(String value) {
+        return value != null && !value.isBlank() ? value : "N/D";
     }
 
     private void addImage(List<String> images, String url) {
@@ -153,82 +139,5 @@ public class ProductDetailServlet extends HttpServlet {
         spec.put("value", value);
         specs.add(spec);
     }
-
-    private String valueOrDefault(String value, String fallback) {
-        return value != null && !value.isBlank() ? value : fallback;
-    }
-
-    private String safeLower(String value) {
-        return value == null ? "" : value.toLowerCase();
-    }
-
-    private boolean isVehicle(Product product) {
-        String category = safeLower(product.getCategory());
-        return category.contains("super") || category.contains("auto") || category.contains("gran turismo") || category.contains("suv");
-    }
-
-    private String inferPower(Product product) {
-        String name = safeLower(product.getName());
-        if (name.contains("ferrari")) return "670 CV";
-        if (name.contains("lamborghini")) return "640 CV";
-        if (name.contains("porsche")) return "520 CV";
-        if (isVehicle(product)) return "450-700 CV";
-        return "Configurazione performance";
-    }
-
-    private String inferAcceleration(Product product) {
-        if (!isVehicle(product)) return "Non applicabile";
-        String name = safeLower(product.getName());
-        if (name.contains("porsche")) return "3,2 s";
-        if (name.contains("ferrari") || name.contains("lamborghini")) return "2,9 s";
-        return "3,8 s";
-    }
-
-    private String inferTopSpeed(Product product) {
-        if (!isVehicle(product)) return "Non applicabile";
-        String name = safeLower(product.getName());
-        if (name.contains("porsche")) return "296 km/h";
-        if (name.contains("ferrari") || name.contains("lamborghini")) return "325 km/h";
-        return "280 km/h";
-    }
-
-    private String inferYear(Product product) {
-        return isVehicle(product) ? "2023" : "2026";
-    }
-
-    private String inferEngine(Product product) {
-        String name = safeLower(product.getName());
-        if (name.contains("ferrari")) return "V8 biturbo 3.9 L";
-        if (name.contains("lamborghini")) return "V10 aspirato 5.2 L";
-        if (name.contains("porsche")) return "6 cilindri boxer 4.0 L";
-        if (isVehicle(product)) return "Motorizzazione sportiva ad alte prestazioni";
-        return "Componente automotive premium";
-    }
-
-    private String inferTransmission(Product product) {
-        return isVehicle(product) ? "Automatico doppia frizione" : "Non applicabile";
-    }
-
-    private String inferDrivetrain(Product product) {
-        String name = safeLower(product.getName());
-        if (name.contains("lamborghini")) return "Integrale AWD";
-        if (name.contains("porsche")) return "Posteriore";
-        return isVehicle(product) ? "Posteriore / AWD" : "Non applicabile";
-    }
-
-    private String inferConsumption(Product product) {
-        return isVehicle(product) ? "11,4-13,8 l/100 km ciclo combinato" : "Non applicabile";
-    }
-
-    private String inferMileage(Product product) {
-        return isVehicle(product) ? "Da verificare in fase di trattativa" : "Nuovo";
-    }
-
-    private String inferDimensions(Product product) {
-        return isVehicle(product) ? "Circa 4,55 m x 1,95 m x 1,20 m" : "Specifiche variabili per modello";
-    }
-
-    private String inferWarranty(Product product) {
-        return isVehicle(product) ? "12 mesi con controlli AutoHUB" : "24 mesi sul prodotto";
-    }
 }
+
